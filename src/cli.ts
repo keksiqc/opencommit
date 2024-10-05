@@ -24,11 +24,11 @@ cli(
         type: Boolean,
         alias: 'y',
         description: 'Skip commit confirmation prompt',
-        default: false
-      }
+        default: false,
+      },
     },
     ignoreArgv: (type) => type === 'unknown-flag' || type === 'argument',
-    help: { description: packageJSON.description }
+    help: { description: packageJSON.description },
   },
   async ({ flags }) => {
     await runMigrations()
@@ -40,5 +40,5 @@ cli(
       commit(extraArgs, false, flags.fgm, flags.yes)
     }
   },
-  extraArgs
+  extraArgs,
 )

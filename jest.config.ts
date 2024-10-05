@@ -19,10 +19,10 @@ const config: Config = {
       'ts-jest',
       {
         diagnostics: false,
-        useESM: true
-      }
-    ]
-  }
+        useESM: true,
+      },
+    ],
+  },
 }
 
 export default config

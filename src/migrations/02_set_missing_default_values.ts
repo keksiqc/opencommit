@@ -1,8 +1,8 @@
 import {
-  ConfigType,
+  type ConfigType,
   DEFAULT_CONFIG,
   getGlobalConfig,
-  setConfig
+  setConfig,
 } from '../commands/config'
 
 export default function () {

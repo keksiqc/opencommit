@@ -7,13 +7,13 @@ import { COMMANDS } from './ENUMS'
 
 export enum CONFIG_MODES {
   get = 'get',
-  force = 'force'
+  force = 'force',
 }
 
 export const commitlintConfigCommand = command(
   {
     name: COMMANDS.commitlint,
-    parameters: ['<mode>']
+    parameters: ['<mode>'],
   },
   async (argv) => {
     intro('opencommit — configure @commitlint')
@@ -34,11 +34,11 @@ export const commitlintConfigCommand = command(
       }
 
       throw new Error(
-        `Unsupported mode: ${mode}. Valid modes are: "force" and "get"`
+        `Unsupported mode: ${mode}. Valid modes are: "force" and "get"`,
       )
     } catch (error) {
       outro(`${chalk.red('✖')} ${error}`)
       process.exit(1)
     }
-  }
+  },
 )

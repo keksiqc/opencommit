@@ -2,7 +2,7 @@ import {
   CONFIG_KEYS,
   getConfig,
   OCO_AI_PROVIDER_ENUM,
-  setConfig
+  setConfig,
 } from '../commands/config'
 
 export default function () {
@@ -34,8 +34,8 @@ export default function () {
   } else {
     throw new Error(
       `Migration failed, set AI provider first. Run "oco config set OCO_AI_PROVIDER=<provider>", where <provider> is one of: ${Object.values(
-        OCO_AI_PROVIDER_ENUM
-      ).join(', ')}`
+        OCO_AI_PROVIDER_ENUM,
+      ).join(', ')}`,
     )
   }
 

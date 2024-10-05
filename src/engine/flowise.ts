@@ -1,6 +1,6 @@
-import axios, { AxiosInstance } from 'axios'
-import { OpenAI } from 'openai'
-import { AiEngine, AiEngineConfig } from './Engine'
+import axios, { type AxiosInstance } from 'axios'
+import type { OpenAI } from 'openai'
+import type { AiEngine, AiEngineConfig } from './Engine'
 
 interface FlowiseAiConfig extends AiEngineConfig {}
 
@@ -12,12 +12,12 @@ export class FlowiseEngine implements AiEngine {
     this.config = config
     this.client = axios.create({
       url: `${config.baseURL}/${config.apiKey}`,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     })
   }
 
   async generateCommitMessage(
-    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
+    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
   ): Promise<string | undefined> {
     const gitDiff = (messages[messages.length - 1]?.content as string)
       .replace(/\\/g, '\\\\')
@@ -29,9 +29,9 @@ export class FlowiseEngine implements AiEngine {
     const payload = {
       question: gitDiff,
       overrideConfig: {
-        systemMessagePrompt: messages[0]?.content
+        systemMessagePrompt: messages[0]?.content,
       },
-      history: messages.slice(1, -1)
+      history: messages.slice(1, -1),
     }
     try {
       const response = await this.client.post('', payload)

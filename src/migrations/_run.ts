@@ -7,7 +7,7 @@ import chalk from 'chalk'
 import {
   getConfig,
   getIsGlobalConfigFileExist,
-  OCO_AI_PROVIDER_ENUM
+  OCO_AI_PROVIDER_ENUM,
 } from '../commands/config'
 
 const migrationsFile = pathJoin(homedir(), '.opencommit_migrations')
@@ -48,7 +48,7 @@ export const runMigrations = async () => {
         outro(
           `${chalk.red('Failed to apply migration')} ${
             migration.name
-          }: ${error}`
+          }: ${error}`,
         )
         process.exit(1)
       }
@@ -60,8 +60,8 @@ export const runMigrations = async () => {
   if (isMigrated) {
     outro(
       `${chalk.green(
-        '✔'
-      )} Migrations to your config were applied successfully. Please rerun.`
+        '✔',
+      )} Migrations to your config were applied successfully. Please rerun.`,
     )
     process.exit(0)
   }

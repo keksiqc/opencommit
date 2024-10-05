@@ -25,12 +25,12 @@ export enum CONFIG_KEYS {
   OCO_ONE_LINE_COMMIT = 'OCO_ONE_LINE_COMMIT',
   OCO_TEST_MOCK_TYPE = 'OCO_TEST_MOCK_TYPE',
   OCO_API_URL = 'OCO_API_URL',
-  OCO_GITPUSH = 'OCO_GITPUSH' // todo: deprecate
+  OCO_GITPUSH = 'OCO_GITPUSH', // todo: deprecate
 }
 
 export enum CONFIG_MODES {
   get = 'get',
-  set = 'set'
+  set = 'set',
 }
 
 export const MODEL_LIST = {
@@ -60,14 +60,14 @@ export const MODEL_LIST = {
     'gpt-4-32k-0613',
     'gpt-4o',
     'gpt-4o-2024-05-13',
-    'gpt-4o-mini-2024-07-18'
+    'gpt-4o-mini-2024-07-18',
   ],
 
   anthropic: [
     'claude-3-5-sonnet-20240620',
     'claude-3-opus-20240229',
     'claude-3-sonnet-20240229',
-    'claude-3-haiku-20240307'
+    'claude-3-haiku-20240307',
   ],
 
   gemini: [
@@ -75,7 +75,7 @@ export const MODEL_LIST = {
     'gemini-1.5-pro',
     'gemini-1.0-pro',
     'gemini-pro-vision',
-    'text-embedding-004'
+    'text-embedding-004',
   ],
 
   groq: [
@@ -85,8 +85,8 @@ export const MODEL_LIST = {
     'llama-3.1-8b-instant', // Llama 3.1 8B (Preview)
     'llama-3.1-70b-versatile', // Llama 3.1 70B (Preview)
     'gemma-7b-it', // Gemma 7B
-    'gemma2-9b-it' // Gemma 2 9B
-  ]
+    'gemma2-9b-it', // Gemma 2 9B
+  ],
 }
 
 const getDefaultModel = (provider: string | undefined): string => {
@@ -106,19 +106,19 @@ const getDefaultModel = (provider: string | undefined): string => {
 
 export enum DEFAULT_TOKEN_LIMITS {
   DEFAULT_MAX_TOKENS_INPUT = 40960,
-  DEFAULT_MAX_TOKENS_OUTPUT = 4096
+  DEFAULT_MAX_TOKENS_OUTPUT = 4096,
 }
 
 const validateConfig = (
   key: string,
   condition: any,
-  validationMessage: string
+  validationMessage: string,
 ) => {
   if (!condition) {
     outro(`${chalk.red('✖')} wrong value for ${key}: ${validationMessage}.`)
 
     outro(
-      'For more help refer to docs https://github.com/di-sukharev/opencommit'
+      'For more help refer to docs https://github.com/di-sukharev/opencommit',
     )
 
     process.exit(1)
@@ -132,13 +132,13 @@ export const configValidators = {
     validateConfig(
       'OCO_API_KEY',
       typeof value === 'string' && value.length > 0,
-      'Empty value is not allowed'
+      'Empty value is not allowed',
     )
 
     validateConfig(
       'OCO_API_KEY',
       value,
-      'You need to provide the OCO_API_KEY when OCO_AI_PROVIDER set to "openai" (default) or "ollama" or "azure" or "gemini" or "flowise" or "anthropic". Run `oco config set OCO_API_KEY=your_key OCO_AI_PROVIDER=openai`'
+      'You need to provide the OCO_API_KEY when OCO_AI_PROVIDER set to "openai" (default) or "ollama" or "azure" or "gemini" or "flowise" or "anthropic". Run `oco config set OCO_API_KEY=your_key OCO_AI_PROVIDER=openai`',
     )
 
     return value
@@ -148,29 +148,29 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_DESCRIPTION,
       typeof value === 'boolean',
-      'Must be boolean: true or false'
+      'Must be boolean: true or false',
     )
 
     return value
   },
 
   [CONFIG_KEYS.OCO_TOKENS_MAX_INPUT](value: any) {
-    value = parseInt(value)
+    value = Number.parseInt(value)
     validateConfig(
       CONFIG_KEYS.OCO_TOKENS_MAX_INPUT,
       !isNaN(value),
-      'Must be a number'
+      'Must be a number',
     )
 
     return value
   },
 
   [CONFIG_KEYS.OCO_TOKENS_MAX_OUTPUT](value: any) {
-    value = parseInt(value)
+    value = Number.parseInt(value)
     validateConfig(
       CONFIG_KEYS.OCO_TOKENS_MAX_OUTPUT,
       !isNaN(value),
-      'Must be a number'
+      'Must be a number',
     )
 
     return value
@@ -180,7 +180,7 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_EMOJI,
       typeof value === 'boolean',
-      'Must be boolean: true or false'
+      'Must be boolean: true or false',
     )
 
     return value
@@ -192,7 +192,7 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_LANGUAGE,
       getI18nLocal(value),
-      `${value} is not supported yet. Supported languages: ${supportedLanguages}`
+      `${value} is not supported yet. Supported languages: ${supportedLanguages}`,
     )
 
     return getI18nLocal(value)
@@ -202,7 +202,7 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_API_URL,
       typeof value === 'string',
-      `${value} is not a valid URL. It should start with 'http://' or 'https://'.`
+      `${value} is not a valid URL. It should start with 'http://' or 'https://'.`,
     )
     return value
   },
@@ -214,8 +214,8 @@ export const configValidators = {
       `${value} is not supported yet, use:\n\n ${[
         ...MODEL_LIST.openai,
         ...MODEL_LIST.anthropic,
-        ...MODEL_LIST.gemini
-      ].join('\n')}`
+        ...MODEL_LIST.gemini,
+      ].join('\n')}`,
     )
     return value
   },
@@ -224,7 +224,7 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_MESSAGE_TEMPLATE_PLACEHOLDER,
       value.startsWith('$'),
-      `${value} must start with $, for example: '$msg'`
+      `${value} must start with $, for example: '$msg'`,
     )
     return value
   },
@@ -233,7 +233,7 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_PROMPT_MODULE,
       ['conventional-commit', '@commitlint'].includes(value),
-      `${value} is not supported yet, use '@commitlint' or 'conventional-commit' (default)`
+      `${value} is not supported yet, use '@commitlint' or 'conventional-commit' (default)`,
     )
     return value
   },
@@ -243,7 +243,7 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_GITPUSH,
       typeof value === 'boolean',
-      'Must be true or false'
+      'Must be true or false',
     )
     return value
   },
@@ -260,9 +260,9 @@ export const configValidators = {
         'azure',
         'test',
         'flowise',
-        'groq'
+        'groq',
       ].includes(value) || value.startsWith('ollama'),
-      `${value} is not supported yet, use 'ollama', 'anthropic', 'azure', 'gemini', 'flowise' or 'openai' (default)`
+      `${value} is not supported yet, use 'ollama', 'anthropic', 'azure', 'gemini', 'flowise' or 'openai' (default)`,
     )
 
     return value
@@ -272,7 +272,7 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_ONE_LINE_COMMIT,
       typeof value === 'boolean',
-      'Must be true or false'
+      'Must be true or false',
     )
 
     return value
@@ -283,8 +283,8 @@ export const configValidators = {
       CONFIG_KEYS.OCO_TEST_MOCK_TYPE,
       TEST_MOCK_TYPES.includes(value),
       `${value} is not supported yet, use ${TEST_MOCK_TYPES.map(
-        (t) => `'${t}'`
-      ).join(', ')}`
+        (t) => `'${t}'`,
+      ).join(', ')}`,
     )
     return value
   },
@@ -293,10 +293,10 @@ export const configValidators = {
     validateConfig(
       CONFIG_KEYS.OCO_WHY,
       typeof value === 'boolean',
-      'Must be true or false'
+      'Must be true or false',
     )
     return value
-  }
+  },
 }
 
 export enum OCO_AI_PROVIDER_ENUM {
@@ -307,7 +307,7 @@ export enum OCO_AI_PROVIDER_ENUM {
   AZURE = 'azure',
   TEST = 'test',
   FLOWISE = 'flowise',
-  GROQ = 'groq'
+  GROQ = 'groq',
 }
 
 export type ConfigType = {
@@ -346,7 +346,7 @@ const assertConfigsAreValid = (config: Record<string, any>) => {
     } catch (error) {
       outro(`Unknown '${key}' config option or missing validator.`)
       outro(
-        `Manually fix the '.env' file or global '~/.opencommit' config file.`
+        `Manually fix the '.env' file or global '~/.opencommit' config file.`,
       )
 
       process.exit(1)
@@ -356,7 +356,7 @@ const assertConfigsAreValid = (config: Record<string, any>) => {
 
 enum OCO_PROMPT_MODULE_ENUM {
   CONVENTIONAL_COMMIT = 'conventional-commit',
-  COMMITLINT = '@commitlint'
+  COMMITLINT = '@commitlint',
 }
 
 export const DEFAULT_CONFIG = {
@@ -372,7 +372,7 @@ export const DEFAULT_CONFIG = {
   OCO_ONE_LINE_COMMIT: false,
   OCO_TEST_MOCK_TYPE: 'commit-message',
   OCO_WHY: false,
-  OCO_GITPUSH: true // todo: deprecate
+  OCO_GITPUSH: true, // todo: deprecate
 }
 
 const initGlobalConfig = (configPath: string = defaultConfigPath) => {
@@ -399,7 +399,7 @@ const getEnvConfig = (envPath: string) => {
 
     OCO_TOKENS_MAX_INPUT: parseConfigVarValue(process.env.OCO_TOKENS_MAX_INPUT),
     OCO_TOKENS_MAX_OUTPUT: parseConfigVarValue(
-      process.env.OCO_TOKENS_MAX_OUTPUT
+      process.env.OCO_TOKENS_MAX_OUTPUT,
     ),
 
     OCO_DESCRIPTION: parseConfigVarValue(process.env.OCO_DESCRIPTION),
@@ -411,19 +411,19 @@ const getEnvConfig = (envPath: string) => {
     OCO_ONE_LINE_COMMIT: parseConfigVarValue(process.env.OCO_ONE_LINE_COMMIT),
     OCO_TEST_MOCK_TYPE: process.env.OCO_TEST_MOCK_TYPE,
 
-    OCO_GITPUSH: parseConfigVarValue(process.env.OCO_GITPUSH) // todo: deprecate
+    OCO_GITPUSH: parseConfigVarValue(process.env.OCO_GITPUSH), // todo: deprecate
   }
 }
 
 export const setGlobalConfig = (
   config: ConfigType,
-  configPath: string = defaultConfigPath
+  configPath: string = defaultConfigPath,
 ) => {
   writeFileSync(configPath, iniStringify(config), 'utf8')
 }
 
 export const getIsGlobalConfigFileExist = (
-  configPath: string = defaultConfigPath
+  configPath: string = defaultConfigPath,
 ) => {
   return existsSync(configPath)
 }
@@ -477,13 +477,13 @@ const cleanUndefinedValues = (config: ConfigType) => {
       } catch (error) {
         return [_, v]
       }
-    })
+    }),
   )
 }
 
 export const getConfig = ({
   envPath = defaultEnvPath,
-  globalPath = defaultConfigPath
+  globalPath = defaultConfigPath,
 }: GetConfigOptions = {}): ConfigType => {
   const envConfig = getEnvConfig(envPath)
   const globalConfig = getGlobalConfig(globalPath)
@@ -497,10 +497,10 @@ export const getConfig = ({
 
 export const setConfig = (
   keyValues: [key: string, value: string | boolean | number | null][],
-  globalConfigPath: string = defaultConfigPath
+  globalConfigPath: string = defaultConfigPath,
 ) => {
   const config = getConfig({
-    globalPath: globalConfigPath
+    globalPath: globalConfigPath,
   })
 
   const configToSet = {}
@@ -509,7 +509,7 @@ export const setConfig = (
     if (!configValidators.hasOwnProperty(key)) {
       const supportedKeys = Object.keys(configValidators).join('\n')
       throw new Error(
-        `Unsupported config key: ${key}. Expected keys are:\n\n${supportedKeys}.\n\nFor more help refer to our docs: https://github.com/di-sukharev/opencommit`
+        `Unsupported config key: ${key}. Expected keys are:\n\n${supportedKeys}.\n\nFor more help refer to our docs: https://github.com/di-sukharev/opencommit`,
       )
     }
 
@@ -524,7 +524,7 @@ export const setConfig = (
 
     const validValue = configValidators[key as CONFIG_KEYS](
       parsedConfigValue,
-      config
+      config,
     )
 
     configToSet[key] = validValue
@@ -538,7 +538,7 @@ export const setConfig = (
 export const configCommand = command(
   {
     name: COMMANDS.config,
-    parameters: ['<mode>', '<key=values...>']
+    parameters: ['<mode>', '<key=values...>'],
   },
   async (argv) => {
     try {
@@ -552,16 +552,16 @@ export const configCommand = command(
         }
       } else if (mode === CONFIG_MODES.set) {
         await setConfig(
-          keyValues.map((keyValue) => keyValue.split('=') as [string, string])
+          keyValues.map((keyValue) => keyValue.split('=') as [string, string]),
         )
       } else {
         throw new Error(
-          `Unsupported mode: ${mode}. Valid modes are: "set" and "get"`
+          `Unsupported mode: ${mode}. Valid modes are: "set" and "get"`,
         )
       }
     } catch (error) {
       outro(`${chalk.red('✖')} ${error}`)
       process.exit(1)
     }
-  }
+  },
 )

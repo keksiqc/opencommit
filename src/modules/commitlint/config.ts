@@ -1,13 +1,13 @@
 import { spinner } from '@clack/prompts'
 
 import { getConfig } from '../../commands/config'
-import { i18n, I18nLocals } from '../../i18n'
+import { i18n, type I18nLocals } from '../../i18n'
 import { getEngine } from '../../utils/engine'
 import { COMMITLINT_LLM_CONFIG_PATH } from './constants'
 import { computeHash } from './crypto'
 import { commitlintPrompts, inferPromptsFromCommitlintConfig } from './prompts'
 import { getCommitLintPWDConfig } from './pwd-commitlint'
-import { CommitlintLLMConfig } from './types'
+import type { CommitlintLLMConfig } from './types'
 import * as utils from './utils'
 
 const config = getConfig()
@@ -26,7 +26,7 @@ export const configureCommitlintIntegration = async (force = false) => {
       * @commitlint >= 9.0.0 is installed in the local directory.
       * 'node_modules/@commitlint/load' package exists.
       * A valid @commitlint configuration exists.
-      `
+      `,
     )
   }
 
@@ -45,7 +45,7 @@ export const configureCommitlintIntegration = async (force = false) => {
     const { hash: existingHash } = await utils.getCommitlintLLMConfig()
     if (hash === existingHash && !force) {
       spin.stop(
-        'Hashes are the same, no need to update the config. Run "force" command to bypass.'
+        'Hashes are the same, no need to update the config. Run "force" command to bypass.',
       )
       return
     }
@@ -68,8 +68,9 @@ export const configureCommitlintIntegration = async (force = false) => {
   let consistency =
     (await engine.generateCommitMessage(consistencyPrompts)) || '{}'
 
-  // Cleanup the consistency answer. Sometimes 'gpt-3.5-turbo' sends rule's back.
-  prompts.forEach((prompt) => (consistency = consistency.replace(prompt, '')))
+  for (const prompt of prompts) {
+    consistency = consistency.replace(prompt, '')
+  }
 
   // sometimes consistency is preceded by explanatory text like "Here is your JSON:"
   consistency = utils.getJSONBlock(consistency)
@@ -82,9 +83,9 @@ export const configureCommitlintIntegration = async (force = false) => {
     prompts,
     consistency: {
       [translation.localLanguage]: {
-        ...JSON.parse(consistency as string)
-      }
-    }
+        ...JSON.parse(consistency as string),
+      },
+    },
   }
 
   await utils.writeCommitlintLLMConfig(commitlintLLMConfig)

@@ -26,7 +26,7 @@ export const prepareEnvironment = async (): Promise<{
   }
   return {
     gitDir,
-    cleanup
+    cleanup,
   }
 }
 

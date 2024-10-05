@@ -1,16 +1,16 @@
 import chalk from 'chalk'
-import { OpenAI } from 'openai'
+import type { OpenAI } from 'openai'
 
 import { outro } from '@clack/prompts'
 import {
-  PromptConfig,
-  QualifiedConfig,
+  type PromptConfig,
+  type QualifiedConfig,
   RuleConfigSeverity,
-  RuleConfigTuple
+  type RuleConfigTuple,
 } from '@commitlint/types'
 
 import { getConfig } from '../../commands/config'
-import { i18n, I18nLocals } from '../../i18n'
+import { type I18nLocals, i18n } from '../../i18n'
 import { IDENTITY, INIT_DIFF_PROMPT } from '../../prompts'
 
 const config = getConfig()
@@ -24,15 +24,19 @@ type DeepPartial<T> = {
 
 type PromptFunction = (
   applicable: string,
+  // TODO: Replace any with a more specific type.
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   value: any,
-  prompt: DeepPartial<PromptConfig>
+  prompt: DeepPartial<PromptConfig>,
 ) => string
 
 type PromptResolverFunction = (
   key: string,
   applicable: string,
+  // TODO: Replace any with a more specific type.
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   value: any,
-  prompt?: DeepPartial<PromptConfig>
+  prompt?: DeepPartial<PromptConfig>,
 ) => string
 
 /**
@@ -41,7 +45,7 @@ type PromptResolverFunction = (
  */
 const getTypeRuleExtraDescription = (
   type: string,
-  prompt?: DeepPartial<PromptConfig>
+  prompt?: DeepPartial<PromptConfig>,
 ) => prompt?.questions?.type?.enum?.[type]?.description
 
 /*
@@ -75,7 +79,8 @@ const llmReadableRules: {
             const description = getTypeRuleExtraDescription(v, prompt)
             if (description) {
               return `${v} (${description})`
-            } else return v
+            }
+            return v
           })
           .join('\n  - ')
       : value
@@ -85,7 +90,7 @@ const llmReadableRules: {
   maxLengthRule: (key, applicable, value: string) =>
     `The ${key} should ${applicable} have ${value} characters or less.`,
   minLengthRule: (key, applicable, value: string) =>
-    `The ${key} should ${applicable} have ${value} characters or more.`
+    `The ${key} should ${applicable} have ${value} characters or more.`,
 }
 
 /**
@@ -162,13 +167,13 @@ const rulesPrompts: {
   'type-max-length': (applicable: string, value: string) =>
     llmReadableRules.maxLengthRule('type', applicable, value),
   'type-min-length': (applicable: string, value: string) =>
-    llmReadableRules.minLengthRule('type', applicable, value)
+    llmReadableRules.minLengthRule('type', applicable, value),
 }
 
 const getPrompt = (
   ruleName: string,
   ruleConfig: RuleConfigTuple<unknown>,
-  prompt: DeepPartial<PromptConfig>
+  prompt: DeepPartial<PromptConfig>,
 ) => {
   const [severity, applicable, value] = ruleConfig
 
@@ -188,13 +193,13 @@ const getPrompt = (
 }
 
 export const inferPromptsFromCommitlintConfig = (
-  config: QualifiedConfig
+  config: QualifiedConfig,
 ): string[] => {
   const { rules, prompt } = config
   if (!rules) return []
   return Object.keys(rules)
     .map((ruleName) =>
-      getPrompt(ruleName, rules[ruleName] as RuleConfigTuple<unknown>, prompt)
+      getPrompt(ruleName, rules[ruleName] as RuleConfigTuple<unknown>, prompt),
     )
     .filter((prompt) => prompt !== null) as string[]
 }
@@ -210,7 +215,7 @@ const STRUCTURE_OF_COMMIT = `
 
 // Prompt to generate LLM-readable rules based on @commitlint rules.
 const GEN_COMMITLINT_CONSISTENCY_PROMPT = (
-  prompts: string[]
+  prompts: string[],
 ): OpenAI.Chat.Completions.ChatCompletionMessageParam[] => [
   {
     role: 'system',
@@ -241,9 +246,9 @@ Additional Details:
 - Changing the variable 'port' to uppercase 'PORT' is considered a bug fix. 
 - Allowing the server to listen on a port specified through the environment variable is considered a new feature. 
 
-Example Git Diff is to follow:`
+Example Git Diff is to follow:`,
   },
-  INIT_DIFF_PROMPT
+  INIT_DIFF_PROMPT,
 ]
 
 /**
@@ -255,7 +260,7 @@ Example Git Diff is to follow:`
  */
 const INIT_MAIN_PROMPT = (
   language: string,
-  prompts: string[]
+  prompts: string[],
 ): OpenAI.Chat.Completions.ChatCompletionMessageParam => ({
   role: 'system',
   content: `${IDENTITY} Your mission is to create clean and comprehensive commit messages in the given @commitlint convention and explain WHAT were the changes ${
@@ -282,10 +287,10 @@ You will strictly follow the following conventions to generate the content of th
 - ${prompts.join('\n- ')}
 
 The conventions refers to the following structure of commit message:
-${STRUCTURE_OF_COMMIT}`
+${STRUCTURE_OF_COMMIT}`,
 })
 
 export const commitlintPrompts = {
   INIT_MAIN_PROMPT,
-  GEN_COMMITLINT_CONSISTENCY_PROMPT
+  GEN_COMMITLINT_CONSISTENCY_PROMPT,
 }

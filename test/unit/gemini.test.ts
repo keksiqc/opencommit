@@ -1,12 +1,12 @@
 import { GeminiEngine } from '../../src/engine/gemini'
 
-import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai'
+import { type GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai'
 import {
-  ConfigType,
+  type ConfigType,
   getConfig,
-  OCO_AI_PROVIDER_ENUM
+  OCO_AI_PROVIDER_ENUM,
 } from '../../src/commands/config'
-import { OpenAI } from 'openai'
+import type { OpenAI } from 'openai'
 
 describe('Gemini', () => {
   let gemini: GeminiEngine
@@ -22,7 +22,7 @@ describe('Gemini', () => {
 
     gemini = new GeminiEngine({
       apiKey: mockConfig.OCO_API_KEY,
-      model: mockConfig.OCO_MODEL
+      model: mockConfig.OCO_MODEL,
     })
   }
 
@@ -37,7 +37,7 @@ describe('Gemini', () => {
 
     jest.mock('@clack/prompts', () => ({
       intro: jest.fn(),
-      outro: jest.fn()
+      outro: jest.fn(),
     }))
 
     mockExit = jest.spyOn(process, 'exit').mockImplementation()
@@ -50,7 +50,7 @@ describe('Gemini', () => {
 
     mockGoogleGenerativeAi = new GoogleGenerativeAI(mockConfig.OCO_API_KEY)
     mockGenerativeModel = mockGoogleGenerativeAi.getGenerativeModel({
-      model: mockConfig.OCO_MODEL
+      model: mockConfig.OCO_MODEL,
     })
   })
 
@@ -83,7 +83,7 @@ describe('Gemini', () => {
     const messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam> =
       [
         { role: 'system', content: 'system message' },
-        { role: 'assistant', content: 'assistant message' }
+        { role: 'assistant', content: 'assistant message' },
       ]
 
     jest

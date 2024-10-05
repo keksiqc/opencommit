@@ -1,13 +1,13 @@
 import {
-  Content,
+  type Content,
   GoogleGenerativeAI,
   HarmBlockThreshold,
   HarmCategory,
-  Part
+  type Part,
 } from '@google/generative-ai'
 import axios from 'axios'
-import { OpenAI } from 'openai'
-import { AiEngine, AiEngineConfig } from './Engine'
+import type { OpenAI } from 'openai'
+import type { AiEngine, AiEngineConfig } from './Engine'
 
 interface GeminiConfig extends AiEngineConfig {}
 
@@ -21,7 +21,7 @@ export class GeminiEngine implements AiEngine {
   }
 
   async generateCommitMessage(
-    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
+    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
   ): Promise<string | undefined> {
     const systemInstruction = messages
       .filter((m) => m.role === 'system')
@@ -30,7 +30,7 @@ export class GeminiEngine implements AiEngine {
 
     const gemini = this.client.getGenerativeModel({
       model: this.config.model,
-      systemInstruction
+      systemInstruction,
     })
 
     const contents = messages
@@ -39,8 +39,8 @@ export class GeminiEngine implements AiEngine {
         (m) =>
           ({
             parts: [{ text: m.content } as Part],
-            role: m.role === 'user' ? m.role : 'model'
-          }) as Content
+            role: m.role === 'user' ? m.role : 'model',
+          }) as Content,
       )
 
     try {
@@ -49,26 +49,26 @@ export class GeminiEngine implements AiEngine {
         safetySettings: [
           {
             category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
+            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
           },
           {
             category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
+            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
           },
           {
             category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
+            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
           },
           {
             category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
-          }
+            threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+          },
         ],
         generationConfig: {
           maxOutputTokens: this.config.maxTokensOutput,
           temperature: 0,
-          topP: 0.1
-        }
+          topP: 0.1,
+        },
       })
 
       return result.response.text()

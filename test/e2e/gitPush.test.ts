@@ -27,7 +27,7 @@ const prepareNoRemoteGitRepository = async (): Promise<{
   }
   return {
     gitDir,
-    cleanup
+    cleanup,
   }
 }
 
@@ -51,7 +51,7 @@ const prepareOneRemoteGitRepository = async (): Promise<{
   }
   return {
     gitDir,
-    cleanup
+    cleanup,
   }
 }
 
@@ -79,7 +79,7 @@ const prepareTwoRemotesGitRepository = async (): Promise<{
   }
   return {
     gitDir,
-    cleanup
+    cleanup,
   }
 }
 
@@ -88,29 +88,29 @@ describe('cli flow to push git branch', () => {
     const { gitDir, cleanup } = await prepareNoRemoteGitRepository()
 
     await render('echo', [`'console.log("Hello World");' > index.ts`], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     await render('git', ['add index.ts'], { cwd: gitDir })
 
     const { queryByText, findByText, userEvent } = await render(
       `OCO_AI_PROVIDER='test' OCO_GITPUSH='false' node`,
       [resolve('./out/cli.cjs')],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
     expect(await findByText('Confirm the commit message?')).toBeInTheConsole()
     userEvent.keyboard('[Enter]')
 
     expect(
-      await queryByText('Choose a remote to push to')
+      await queryByText('Choose a remote to push to'),
     ).not.toBeInTheConsole()
     expect(
-      await queryByText('Do you want to run `git push`?')
+      await queryByText('Do you want to run `git push`?'),
     ).not.toBeInTheConsole()
     expect(
-      await queryByText('Successfully pushed all commits to origin')
+      await queryByText('Successfully pushed all commits to origin'),
     ).not.toBeInTheConsole()
     expect(
-      await queryByText('Command failed with exit code 1')
+      await queryByText('Command failed with exit code 1'),
     ).not.toBeInTheConsole()
 
     await cleanup()
@@ -120,30 +120,30 @@ describe('cli flow to push git branch', () => {
     const { gitDir, cleanup } = await prepareNoRemoteGitRepository()
 
     await render('echo', [`'console.log("Hello World");' > index.ts`], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     await render('git', ['add index.ts'], { cwd: gitDir })
 
     const { queryByText, findByText, userEvent } = await render(
       `OCO_AI_PROVIDER='test' node`,
       [resolve('./out/cli.cjs')],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
     expect(await findByText('Confirm the commit message?')).toBeInTheConsole()
     userEvent.keyboard('[Enter]')
 
     expect(
-      await queryByText('Choose a remote to push to')
+      await queryByText('Choose a remote to push to'),
     ).not.toBeInTheConsole()
     expect(
-      await queryByText('Do you want to run `git push`?')
+      await queryByText('Do you want to run `git push`?'),
     ).not.toBeInTheConsole()
     expect(
-      await queryByText('Successfully pushed all commits to origin')
+      await queryByText('Successfully pushed all commits to origin'),
     ).not.toBeInTheConsole()
 
     expect(
-      await findByText('Command failed with exit code 1')
+      await findByText('Command failed with exit code 1'),
     ).toBeInTheConsole()
 
     await cleanup()
@@ -153,25 +153,25 @@ describe('cli flow to push git branch', () => {
     const { gitDir, cleanup } = await prepareOneRemoteGitRepository()
 
     await render('echo', [`'console.log("Hello World");' > index.ts`], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     await render('git', ['add index.ts'], { cwd: gitDir })
 
     const { findByText, userEvent } = await render(
       `OCO_AI_PROVIDER='test' node`,
       [resolve('./out/cli.cjs')],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
     expect(await findByText('Confirm the commit message?')).toBeInTheConsole()
     userEvent.keyboard('[Enter]')
 
     expect(
-      await findByText('Do you want to run `git push`?')
+      await findByText('Do you want to run `git push`?'),
     ).toBeInTheConsole()
     userEvent.keyboard('[Enter]')
 
     expect(
-      await findByText('Successfully pushed all commits to origin')
+      await findByText('Successfully pushed all commits to origin'),
     ).toBeInTheConsole()
 
     await cleanup()
@@ -181,14 +181,14 @@ describe('cli flow to push git branch', () => {
     const { gitDir, cleanup } = await prepareTwoRemotesGitRepository()
 
     await render('echo', [`'console.log("Hello World");' > index.ts`], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     await render('git', ['add index.ts'], { cwd: gitDir })
 
     const { findByText, userEvent } = await render(
       `OCO_AI_PROVIDER='test' node`,
       [resolve('./out/cli.cjs')],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
     expect(await findByText('Confirm the commit message?')).toBeInTheConsole()
     userEvent.keyboard('[Enter]')
@@ -197,7 +197,7 @@ describe('cli flow to push git branch', () => {
     userEvent.keyboard('[Enter]')
 
     expect(
-      await findByText('Successfully pushed all commits to origin')
+      await findByText('Successfully pushed all commits to origin'),
     ).toBeInTheConsole()
 
     await cleanup()

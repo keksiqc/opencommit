@@ -13,7 +13,7 @@ export default function () {
     'OCO_GEMINI_API_KEY',
     'OCO_GEMINI_BASE_PATH',
     'OCO_FLOWISE_API_KEY',
-    'OCO_FLOWISE_ENDPOINT'
+    'OCO_FLOWISE_ENDPOINT',
   ]
 
   const globalConfig = getGlobalConfig()

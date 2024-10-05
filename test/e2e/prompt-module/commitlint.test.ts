@@ -39,7 +39,7 @@ describe('cli flow to run "oco commitlint force"', () => {
 
     await setupCommitlint(gitDir, 9)
     const npmList = await render('npm', ['list', '@commitlint/load'], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     expect(await npmList.findByText('@commitlint/load@9')).toBeInTheConsole()
 
@@ -51,21 +51,21 @@ describe('cli flow to run "oco commitlint force"', () => {
       node ${resolve('./out/cli.cjs')} commitlint force \
     `,
       [],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
 
     expect(
-      await findByText('opencommit — configure @commitlint')
+      await findByText('opencommit — configure @commitlint'),
     ).toBeInTheConsole()
     expect(
-      await findByText('Read @commitlint configuration')
+      await findByText('Read @commitlint configuration'),
     ).toBeInTheConsole()
 
     expect(
-      await findByText('Generating consistency with given @commitlint rules')
+      await findByText('Generating consistency with given @commitlint rules'),
     ).toBeInTheConsole()
     expect(
-      await findByText('Done - please review contents of')
+      await findByText('Done - please review contents of'),
     ).toBeInTheConsole()
 
     await cleanup()
@@ -75,7 +75,7 @@ describe('cli flow to run "oco commitlint force"', () => {
 
     await setupCommitlint(gitDir, 18)
     const npmList = await render('npm', ['list', '@commitlint/load'], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     expect(await npmList.findByText('@commitlint/load@18')).toBeInTheConsole()
 
@@ -87,21 +87,21 @@ describe('cli flow to run "oco commitlint force"', () => {
       node ${resolve('./out/cli.cjs')} commitlint force \
     `,
       [],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
 
     expect(
-      await findByText('opencommit — configure @commitlint')
+      await findByText('opencommit — configure @commitlint'),
     ).toBeInTheConsole()
     expect(
-      await findByText('Read @commitlint configuration')
+      await findByText('Read @commitlint configuration'),
     ).toBeInTheConsole()
 
     expect(
-      await findByText('Generating consistency with given @commitlint rules')
+      await findByText('Generating consistency with given @commitlint rules'),
     ).toBeInTheConsole()
     expect(
-      await findByText('Done - please review contents of')
+      await findByText('Done - please review contents of'),
     ).toBeInTheConsole()
 
     await cleanup()
@@ -111,7 +111,7 @@ describe('cli flow to run "oco commitlint force"', () => {
 
     await setupCommitlint(gitDir, 19)
     const npmList = await render('npm', ['list', '@commitlint/load'], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     expect(await npmList.findByText('@commitlint/load@19')).toBeInTheConsole()
 
@@ -123,21 +123,21 @@ describe('cli flow to run "oco commitlint force"', () => {
       node ${resolve('./out/cli.cjs')} commitlint force \
     `,
       [],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
 
     expect(
-      await findByText('opencommit — configure @commitlint')
+      await findByText('opencommit — configure @commitlint'),
     ).toBeInTheConsole()
     expect(
-      await findByText('Read @commitlint configuration')
+      await findByText('Read @commitlint configuration'),
     ).toBeInTheConsole()
 
     expect(
-      await findByText('Generating consistency with given @commitlint rules')
+      await findByText('Generating consistency with given @commitlint rules'),
     ).toBeInTheConsole()
     expect(
-      await findByText('Done - please review contents of')
+      await findByText('Done - please review contents of'),
     ).toBeInTheConsole()
 
     await cleanup()
@@ -151,7 +151,7 @@ describe('cli flow to generate commit message using @commitlint prompt-module', 
     // Setup commitlint@19
     await setupCommitlint(gitDir, 19)
     const npmList = await render('npm', ['list', '@commitlint/load'], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     expect(await npmList.findByText('@commitlint/load@19')).toBeInTheConsole()
 
@@ -164,10 +164,10 @@ describe('cli flow to generate commit message using @commitlint prompt-module', 
       node ${resolve('./out/cli.cjs')} commitlint force \
     `,
       [],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
     expect(
-      await commitlintForce.findByText('Done - please review contents of')
+      await commitlintForce.findByText('Done - please review contents of'),
     ).toBeInTheConsole()
 
     // Run `oco commitlint get`
@@ -179,13 +179,13 @@ describe('cli flow to generate commit message using @commitlint prompt-module', 
       node ${resolve('./out/cli.cjs')} commitlint get \
     `,
       [],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
     expect(await commitlintGet.findByText('consistency')).toBeInTheConsole()
 
     // Run 'oco' using .opencommit-commitlint
     await render('echo', [`'console.log("Hello World");' > index.ts`], {
-      cwd: gitDir
+      cwd: gitDir,
     })
     await render('git', ['add index.ts'], { cwd: gitDir })
 
@@ -197,24 +197,24 @@ describe('cli flow to generate commit message using @commitlint prompt-module', 
       node ${resolve('./out/cli.cjs')} \
     `,
       [],
-      { cwd: gitDir }
+      { cwd: gitDir },
     )
 
     expect(
-      await oco.findByText('Generating the commit message')
+      await oco.findByText('Generating the commit message'),
     ).toBeInTheConsole()
     expect(
-      await oco.findByText('Confirm the commit message?')
-    ).toBeInTheConsole()
-    oco.userEvent.keyboard('[Enter]')
-
-    expect(
-      await oco.findByText('Do you want to run `git push`?')
+      await oco.findByText('Confirm the commit message?'),
     ).toBeInTheConsole()
     oco.userEvent.keyboard('[Enter]')
 
     expect(
-      await oco.findByText('Successfully pushed all commits to origin')
+      await oco.findByText('Do you want to run `git push`?'),
+    ).toBeInTheConsole()
+    oco.userEvent.keyboard('[Enter]')
+
+    expect(
+      await oco.findByText('Successfully pushed all commits to origin'),
     ).toBeInTheConsole()
 
     await cleanup()

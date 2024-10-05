@@ -1,10 +1,10 @@
-import { OpenAI } from 'openai'
+import type { OpenAI } from 'openai'
 
-import { AiEngine } from './Engine'
+import type { AiEngine } from './Engine'
 
 export const TEST_MOCK_TYPES = [
   'commit-message',
-  'prompt-module-commitlint-config'
+  'prompt-module-commitlint-config',
 ] as const
 
 export type TestMockType = (typeof TEST_MOCK_TYPES)[number]
@@ -26,7 +26,7 @@ export class TestAi implements TestAiEngine {
   }
 
   async generateCommitMessage(
-    _messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
+    _messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
   ): Promise<string | undefined> {
     switch (this.mockType) {
       case 'commit-message':

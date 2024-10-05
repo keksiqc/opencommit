@@ -11,7 +11,7 @@ const fsWriteFile = promisify(writeFile)
  */
 export async function prepareFile(
   fileName: string,
-  content: string
+  content: string,
 ): Promise<{
   filePath: string
   cleanup: () => Promise<void>
@@ -27,6 +27,6 @@ export async function prepareFile(
 
   return {
     filePath,
-    cleanup
+    cleanup,
   }
 }

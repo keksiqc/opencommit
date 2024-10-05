@@ -3,7 +3,7 @@ import {
   CONFIG_KEYS,
   DEFAULT_CONFIG,
   getConfig,
-  setConfig
+  setConfig,
 } from '../../src/commands/config'
 import { prepareFile } from './utils'
 import { dirname } from 'path'
@@ -40,7 +40,7 @@ describe('config', () => {
 
   const generateConfig = async (
     fileName: string,
-    content: Record<string, string>
+    content: Record<string, string>,
   ) => {
     const fileContent = Object.entries(content)
       .map(([key, value]) => `${key}="${value}"`)
@@ -53,17 +53,17 @@ describe('config', () => {
       globalConfigFile = await generateConfig('.opencommit', {
         OCO_API_KEY: 'global-key',
         OCO_MODEL: 'gpt-3.5-turbo',
-        OCO_LANGUAGE: 'en'
+        OCO_LANGUAGE: 'en',
       })
 
       envConfigFile = await generateConfig('.env', {
         OCO_API_KEY: 'local-key',
-        OCO_LANGUAGE: 'fr'
+        OCO_LANGUAGE: 'fr',
       })
 
       const config = getConfig({
         globalPath: globalConfigFile.filePath,
-        envPath: envConfigFile.filePath
+        envPath: envConfigFile.filePath,
       })
 
       expect(config).not.toEqual(null)
@@ -77,16 +77,16 @@ describe('config', () => {
         OCO_API_KEY: 'global-key',
         OCO_MODEL: 'gpt-4',
         OCO_LANGUAGE: 'de',
-        OCO_DESCRIPTION: 'true'
+        OCO_DESCRIPTION: 'true',
       })
 
       envConfigFile = await generateConfig('.env', {
-        OCO_API_URL: 'local-api-url'
+        OCO_API_URL: 'local-api-url',
       })
 
       const config = getConfig({
         globalPath: globalConfigFile.filePath,
-        envPath: envConfigFile.filePath
+        envPath: envConfigFile.filePath,
       })
 
       expect(config).not.toEqual(null)
@@ -101,17 +101,17 @@ describe('config', () => {
       globalConfigFile = await generateConfig('.opencommit', {
         OCO_TOKENS_MAX_INPUT: '4096',
         OCO_TOKENS_MAX_OUTPUT: '500',
-        OCO_GITPUSH: 'true'
+        OCO_GITPUSH: 'true',
       })
 
       envConfigFile = await generateConfig('.env', {
         OCO_TOKENS_MAX_INPUT: '8192',
-        OCO_ONE_LINE_COMMIT: 'false'
+        OCO_ONE_LINE_COMMIT: 'false',
       })
 
       const config = getConfig({
         globalPath: globalConfigFile.filePath,
-        envPath: envConfigFile.filePath
+        envPath: envConfigFile.filePath,
       })
 
       expect(config).not.toEqual(null)
@@ -125,14 +125,14 @@ describe('config', () => {
       globalConfigFile = await generateConfig('.opencommit', {
         OCO_API_KEY: 'global-key',
         OCO_MODEL: 'gpt-4',
-        OCO_LANGUAGE: 'es'
+        OCO_LANGUAGE: 'es',
       })
 
       envConfigFile = await generateConfig('.env', {})
 
       const config = getConfig({
         globalPath: globalConfigFile.filePath,
-        envPath: envConfigFile.filePath
+        envPath: envConfigFile.filePath,
       })
 
       expect(config).not.toEqual(null)
@@ -145,16 +145,16 @@ describe('config', () => {
       globalConfigFile = await generateConfig('.opencommit', {
         OCO_API_KEY: 'global-key',
         OCO_MODEL: 'gpt-4',
-        OCO_LANGUAGE: 'es'
+        OCO_LANGUAGE: 'es',
       })
 
       envConfigFile = await generateConfig('.env', {
-        OCO_API_KEY: 'null'
+        OCO_API_KEY: 'null',
       })
 
       const config = getConfig({
         globalPath: globalConfigFile.filePath,
-        envPath: envConfigFile.filePath
+        envPath: envConfigFile.filePath,
       })
 
       expect(config).not.toEqual(null)
@@ -167,7 +167,7 @@ describe('config', () => {
 
       const config = getConfig({
         globalPath: globalConfigFile.filePath,
-        envPath: envConfigFile.filePath
+        envPath: envConfigFile.filePath,
       })
 
       expect(config).not.toEqual(null)
@@ -188,7 +188,7 @@ describe('config', () => {
 
       await setConfig(
         [[CONFIG_KEYS.OCO_API_KEY, 'persisted-key_1']],
-        globalConfigFile.filePath
+        globalConfigFile.filePath,
       )
 
       const fileContent = readFileSync(globalConfigFile.filePath, 'utf8')
@@ -203,13 +203,13 @@ describe('config', () => {
       await setConfig(
         [
           [CONFIG_KEYS.OCO_API_KEY, 'new-key'],
-          [CONFIG_KEYS.OCO_MODEL, 'gpt-4']
+          [CONFIG_KEYS.OCO_MODEL, 'gpt-4'],
         ],
-        globalConfigFile.filePath
+        globalConfigFile.filePath,
       )
 
       const config = getConfig({
-        globalPath: globalConfigFile.filePath
+        globalPath: globalConfigFile.filePath,
       })
       expect(config.OCO_API_KEY).toEqual('new-key')
       expect(config.OCO_MODEL).toEqual('gpt-4')
@@ -217,15 +217,15 @@ describe('config', () => {
 
     it('should update existing config values', async () => {
       globalConfigFile = await generateConfig('.opencommit', {
-        OCO_API_KEY: 'initial-key'
+        OCO_API_KEY: 'initial-key',
       })
       await setConfig(
         [[CONFIG_KEYS.OCO_API_KEY, 'updated-key']],
-        globalConfigFile.filePath
+        globalConfigFile.filePath,
       )
 
       const config = getConfig({
-        globalPath: globalConfigFile.filePath
+        globalPath: globalConfigFile.filePath,
       })
       expect(config.OCO_API_KEY).toEqual('updated-key')
     })
@@ -236,13 +236,13 @@ describe('config', () => {
         [
           [CONFIG_KEYS.OCO_TOKENS_MAX_INPUT, '8192'],
           [CONFIG_KEYS.OCO_DESCRIPTION, 'true'],
-          [CONFIG_KEYS.OCO_ONE_LINE_COMMIT, 'false']
+          [CONFIG_KEYS.OCO_ONE_LINE_COMMIT, 'false'],
         ],
-        globalConfigFile.filePath
+        globalConfigFile.filePath,
       )
 
       const config = getConfig({
-        globalPath: globalConfigFile.filePath
+        globalPath: globalConfigFile.filePath,
       })
       expect(config.OCO_TOKENS_MAX_INPUT).toEqual(8192)
       expect(config.OCO_DESCRIPTION).toEqual(true)
@@ -255,12 +255,12 @@ describe('config', () => {
       try {
         await setConfig(
           [['UNSUPPORTED_KEY', 'value']],
-          globalConfigFile.filePath
+          globalConfigFile.filePath,
         )
         throw new Error('NEVER_REACHED')
       } catch (error) {
         expect(error.message).toContain(
-          'Unsupported config key: UNSUPPORTED_KEY'
+          'Unsupported config key: UNSUPPORTED_KEY',
         )
         expect(error.message).not.toContain('NEVER_REACHED')
       }
@@ -272,7 +272,7 @@ describe('config', () => {
 
       await setConfig(
         [[CONFIG_KEYS.OCO_API_KEY, 'persisted-key']],
-        globalConfigFile.filePath
+        globalConfigFile.filePath,
       )
 
       const fileContent = readFileSync(globalConfigFile.filePath, 'utf8')
@@ -285,7 +285,7 @@ describe('config', () => {
 
       await setConfig(
         [[CONFIG_KEYS.OCO_API_KEY, 'persisted-key']],
-        globalConfigFile.filePath
+        globalConfigFile.filePath,
       )
 
       const fileContent1 = readFileSync(globalConfigFile.filePath, 'utf8')
@@ -293,7 +293,7 @@ describe('config', () => {
 
       await setConfig(
         [[CONFIG_KEYS.OCO_MODEL, 'gpt-4']],
-        globalConfigFile.filePath
+        globalConfigFile.filePath,
       )
 
       const fileContent2 = readFileSync(globalConfigFile.filePath, 'utf8')

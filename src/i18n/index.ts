@@ -36,7 +36,7 @@ export enum I18nLocals {
   id_ID = 'id_ID',
   pl = 'pl',
   tr = 'tr',
-  th = 'th'
+  th = 'th',
 }
 
 export const i18n = {
@@ -58,7 +58,7 @@ export const i18n = {
   ru,
   pl,
   tr,
-  th
+  th,
 }
 
 export const I18N_CONFIG_ALIAS: { [key: string]: string[] } = {
@@ -80,7 +80,7 @@ export const I18N_CONFIG_ALIAS: { [key: string]: string[] } = {
   id_ID: ['id_ID', 'Bahasa', 'bahasa'],
   pl: ['pl', 'Polish', 'Polski'],
   tr: ['tr', 'Turkish', 'Turkish'],
-  th: ['th', 'Thai', 'ไทย']
+  th: ['th', 'Thai', 'ไทย'],
 }
 
 export function getI18nLocal(value: string): string | boolean {

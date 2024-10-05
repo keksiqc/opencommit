@@ -9,13 +9,11 @@ import { getConfig } from './config'
 
 const [messageFilePath, commitSource] = process.argv.slice(2)
 
-export const prepareCommitMessageHook = async (
-  isStageAllFlag: boolean = false
-) => {
+export const prepareCommitMessageHook = async (isStageAllFlag = false) => {
   try {
     if (!messageFilePath) {
       throw new Error(
-        'Commit message file path is missing. This file should be called from the "prepare-commit-msg" git hook'
+        'Commit message file path is missing. This file should be called from the "prepare-commit-msg" git hook',
       )
     }
 
@@ -41,7 +39,7 @@ export const prepareCommitMessageHook = async (
 
     if (!config.OCO_API_KEY) {
       outro(
-        'No OCO_API_KEY is set. Set your key via `oco config set OCO_API_KEY=<value>. For more info see https://github.com/di-sukharev/opencommit'
+        'No OCO_API_KEY is set. Set your key via `oco config set OCO_API_KEY=<value>. For more info see https://github.com/di-sukharev/opencommit',
       )
       return
     }
@@ -50,7 +48,7 @@ export const prepareCommitMessageHook = async (
     spin.start('Generating commit message')
 
     const commitMessage = await generateCommitMessageByDiff(
-      await getDiff({ files: staged })
+      await getDiff({ files: staged }),
     )
     spin.stop('Done')
 
@@ -58,7 +56,7 @@ export const prepareCommitMessageHook = async (
 
     await fs.writeFile(
       messageFilePath,
-      commitMessage + '\n' + fileContent.toString()
+      commitMessage + '\n' + fileContent.toString(),
     )
   } catch (error) {
     outro(`${chalk.red('✖')} ${error}`)

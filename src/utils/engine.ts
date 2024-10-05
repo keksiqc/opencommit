@@ -1,12 +1,12 @@
 import { getConfig, OCO_AI_PROVIDER_ENUM } from '../commands/config'
 import { AnthropicEngine } from '../engine/anthropic'
 import { AzureEngine } from '../engine/azure'
-import { AiEngine } from '../engine/Engine'
+import type { AiEngine } from '../engine/Engine'
 import { FlowiseEngine } from '../engine/flowise'
 import { GeminiEngine } from '../engine/gemini'
 import { OllamaEngine } from '../engine/ollama'
 import { OpenAiEngine } from '../engine/openAi'
-import { TestAi, TestMockType } from '../engine/testAi'
+import { TestAi, type TestMockType } from '../engine/testAi'
 import { GroqEngine } from '../engine/groq'
 
 export function getEngine(): AiEngine {
@@ -18,7 +18,7 @@ export function getEngine(): AiEngine {
     maxTokensOutput: config.OCO_TOKENS_MAX_OUTPUT!,
     maxTokensInput: config.OCO_TOKENS_MAX_INPUT!,
     baseURL: config.OCO_API_URL!,
-    apiKey: config.OCO_API_KEY!
+    apiKey: config.OCO_API_KEY!,
   }
 
   switch (provider) {

@@ -2,8 +2,8 @@ import core from '@actions/core'
 import exec from '@actions/exec'
 import github from '@actions/github'
 import { intro, outro } from '@clack/prompts'
-import { PushEvent } from '@octokit/webhooks-types'
-import { unlinkSync, writeFileSync } from 'fs'
+import type { PushEvent } from '@octokit/webhooks-types'
+import { unlinkSync, writeFileSync } from 'node:fs'
 import { generateCommitMessageByDiff } from './generateCommitMessageFromGitDiff'
 import { randomIntFromInterval } from './utils/randomIntFromInterval'
 import { sleep } from './utils/sleep'
@@ -29,9 +29,9 @@ async function getCommitDiff(commitSha: string) {
       repo,
       ref: commitSha,
       headers: {
-        Accept: 'application/vnd.github.v3.diff'
-      }
-    }
+        Accept: 'application/vnd.github.v3.diff',
+      },
+    },
   )
   return { sha: commitSha, diff: diffResponse.data }
 }
@@ -52,7 +52,7 @@ async function improveMessagesInChunks(diffsAndSHAs: DiffAndSHA[]) {
   const chunkSize = diffsAndSHAs!.length % 2 === 0 ? 4 : 3
   outro(`Improving commit messages in chunks of ${chunkSize}.`)
   const improvePromises = diffsAndSHAs!.map((commit) =>
-    generateCommitMessageByDiff(commit.diff, false)
+    generateCommitMessageByDiff(commit.diff, false),
   )
 
   const improvedMessagesAndSHAs: MsgAndSHA[] = []
@@ -68,7 +68,7 @@ async function improveMessagesInChunks(diffsAndSHAs: DiffAndSHA[]) {
           const sha = diffsAndSHAs![index + i].sha
 
           return { sha, msg: improvedMsg }
-        }
+        },
       )
 
       improvedMessagesAndSHAs.push(...chunkOfImprovedMessagesBySha)
@@ -79,7 +79,7 @@ async function improveMessagesInChunks(diffsAndSHAs: DiffAndSHA[]) {
         1000 * randomIntFromInterval(1, 5) + 100 * randomIntFromInterval(1, 5)
 
       outro(
-        `Improved ${chunkOfPromises.length} messages. Sleeping for ${sleepFor}`
+        `Improved ${chunkOfPromises.length} messages. Sleeping for ${sleepFor}`,
       )
 
       await sleep(sleepFor)
@@ -112,7 +112,7 @@ const getDiffsBySHAs = async (SHAs: string[]) => {
 }
 
 async function improveCommitMessages(
-  commitsToImprove: { id: string; message: string }[]
+  commitsToImprove: { id: string; message: string }[],
 ): Promise<void> {
   if (commitsToImprove.length) {
     outro(`Found ${commitsToImprove.length} commits to improve.`)
@@ -130,12 +130,12 @@ async function improveCommitMessages(
 
   console.log(
     `Improved ${improvedMessagesWithSHAs.length} commits: `,
-    improvedMessagesWithSHAs
+    improvedMessagesWithSHAs,
   )
 
   // Check if there are actually any changes in the commit messages
   const messagesChanged = improvedMessagesWithSHAs.some(
-    ({ sha, msg }, index) => msg !== commitsToImprove[index].message
+    ({ sha, msg }, index) => msg !== commitsToImprove[index].message,
   )
 
   if (!messagesChanged) {
@@ -146,20 +146,20 @@ async function improveCommitMessages(
   const createCommitMessageFile = (message: string, index: number) =>
     writeFileSync(`./commit-${index}.txt`, message)
   improvedMessagesWithSHAs.forEach(({ msg }, i) =>
-    createCommitMessageFile(msg, i)
+    createCommitMessageFile(msg, i),
   )
 
-  writeFileSync(`./count.txt`, '0')
+  writeFileSync('./count.txt', '0')
 
   writeFileSync(
     './rebase-exec.sh',
     `#!/bin/bash
     count=$(cat count.txt)
     git commit --amend -F commit-$count.txt
-    echo $(( count + 1 )) > count.txt`
+    echo $(( count + 1 )) > count.txt`,
   )
 
-  await exec.exec(`chmod +x ./rebase-exec.sh`)
+  await exec.exec('chmod +x ./rebase-exec.sh')
 
   await exec.exec(
     'git',
@@ -168,9 +168,9 @@ async function improveCommitMessages(
       env: {
         GIT_SEQUENCE_EDITOR: 'sed -i -e "s/^pick/reword/g"',
         GIT_COMMITTER_NAME: process.env.GITHUB_ACTOR!,
-        GIT_COMMITTER_EMAIL: `${process.env.GITHUB_ACTOR}@users.noreply.github.com`
-      }
-    }
+        GIT_COMMITTER_EMAIL: `${process.env.GITHUB_ACTOR}@users.noreply.github.com`,
+      },
+    },
   )
 
   const deleteCommitMessageFile = (index: number) =>
@@ -185,7 +185,7 @@ async function improveCommitMessages(
   await exec.exec('git', ['status'])
 
   // Force push the rebased commits
-  await exec.exec('git', ['push', `--force`])
+  await exec.exec('git', ['push', '--force'])
 
   outro('Done 🧙')
 }
@@ -195,7 +195,7 @@ async function run() {
 
   try {
     if (github.context.eventName === 'push') {
-      outro(`Processing commits in a Push event`)
+      outro('Processing commits in a Push event')
 
       const payload = github.context.payload as PushEvent
 
@@ -214,11 +214,11 @@ async function run() {
     } else {
       outro('Wrong action.')
       core.error(
-        `OpenCommit was called on ${github.context.payload.action}. OpenCommit is supposed to be used on "push" action.`
+        `OpenCommit was called on ${github.context.payload.action}. OpenCommit is supposed to be used on "push" action.`,
       )
     }
-  } catch (error: any) {
-    const err = error?.message || error
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error.message : 'Unknown error'
     core.setFailed(err)
   }
 }

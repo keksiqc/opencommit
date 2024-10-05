@@ -1,15 +1,15 @@
 import AnthropicClient from '@anthropic-ai/sdk'
-import {
+import type {
   MessageCreateParamsNonStreaming,
-  MessageParam
+  MessageParam,
 } from '@anthropic-ai/sdk/resources/messages.mjs'
 import { outro } from '@clack/prompts'
 import axios from 'axios'
 import chalk from 'chalk'
-import { OpenAI } from 'openai'
+import type { OpenAI } from 'openai'
 import { GenerateCommitMessageErrorEnum } from '../generateCommitMessageFromGitDiff'
 import { tokenCount } from '../utils/tokenCount'
-import { AiEngine, AiEngineConfig } from './Engine'
+import type { AiEngine, AiEngineConfig } from './Engine'
 
 interface AnthropicConfig extends AiEngineConfig {}
 
@@ -23,12 +23,12 @@ export class AnthropicEngine implements AiEngine {
   }
 
   public generateCommitMessage = async (
-    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
+    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
   ): Promise<string | undefined> => {
     const systemMessage = messages.find((msg) => msg.role === 'system')
       ?.content as string
     const restMessages = messages.filter(
-      (msg) => msg.role !== 'system'
+      (msg) => msg.role !== 'system',
     ) as MessageParam[]
 
     const params: MessageCreateParamsNonStreaming = {
@@ -37,7 +37,7 @@ export class AnthropicEngine implements AiEngine {
       messages: restMessages,
       temperature: 0,
       top_p: 0.1,
-      max_tokens: this.config.maxTokensOutput
+      max_tokens: this.config.maxTokensOutput,
     }
     try {
       const REQUEST_TOKENS = messages
@@ -68,7 +68,7 @@ export class AnthropicEngine implements AiEngine {
 
         if (anthropicAiError?.message) outro(anthropicAiError.message)
         outro(
-          'For help look into README https://github.com/di-sukharev/opencommit#setup'
+          'For help look into README https://github.com/di-sukharev/opencommit#setup',
         )
       }
 

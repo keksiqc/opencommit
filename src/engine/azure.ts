@@ -1,14 +1,14 @@
 import {
   AzureKeyCredential,
-  OpenAIClient as AzureOpenAIClient
+  OpenAIClient as AzureOpenAIClient,
 } from '@azure/openai'
 import { outro } from '@clack/prompts'
 import axios from 'axios'
 import chalk from 'chalk'
-import { OpenAI } from 'openai'
+import type { OpenAI } from 'openai'
 import { GenerateCommitMessageErrorEnum } from '../generateCommitMessageFromGitDiff'
 import { tokenCount } from '../utils/tokenCount'
-import { AiEngine, AiEngineConfig } from './Engine'
+import type { AiEngine, AiEngineConfig } from './Engine'
 
 interface AzureAiEngineConfig extends AiEngineConfig {
   baseURL: string
@@ -23,12 +23,12 @@ export class AzureEngine implements AiEngine {
     this.config = config
     this.client = new AzureOpenAIClient(
       this.config.baseURL,
-      new AzureKeyCredential(this.config.apiKey)
+      new AzureKeyCredential(this.config.apiKey),
     )
   }
 
   generateCommitMessage = async (
-    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
+    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
   ): Promise<string | undefined> => {
     try {
       const REQUEST_TOKENS = messages
@@ -44,7 +44,7 @@ export class AzureEngine implements AiEngine {
 
       const data = await this.client.getChatCompletions(
         this.config.model,
-        messages
+        messages,
       )
 
       const message = data.choices[0].message
@@ -67,7 +67,7 @@ export class AzureEngine implements AiEngine {
 
         if (openAiError?.message) outro(openAiError.message)
         outro(
-          'For help look into README https://github.com/di-sukharev/opencommit#setup'
+          'For help look into README https://github.com/di-sukharev/opencommit#setup',
         )
       }
 

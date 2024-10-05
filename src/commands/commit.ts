@@ -5,7 +5,7 @@ import {
   multiselect,
   outro,
   select,
-  spinner
+  spinner,
 } from '@clack/prompts'
 import chalk from 'chalk'
 import { execa } from 'execa'
@@ -15,7 +15,7 @@ import {
   getChangedFiles,
   getDiff,
   getStagedFiles,
-  gitAdd
+  gitAdd,
 } from '../utils/git'
 import { trytm } from '../utils/trytm'
 import { getConfig } from './config'
@@ -47,7 +47,7 @@ const generateCommitMessageFromGitDiff = async ({
   diff,
   extraArgs,
   fullGitMojiSpec = false,
-  skipCommitConfirmation = false
+  skipCommitConfirmation = false,
 }: GenerateCommitMessageFromGitDiffParams): Promise<void> => {
   await assertGitRepo()
   const commitGenerationSpinner = spinner()
@@ -66,7 +66,7 @@ const generateCommitMessageFromGitDiff = async ({
 
       commitMessage = messageTemplate.replace(
         config.OCO_MESSAGE_TEMPLATE_PLACEHOLDER,
-        commitMessage
+        commitMessage,
       )
     }
 
@@ -76,13 +76,13 @@ const generateCommitMessageFromGitDiff = async ({
       `Generated commit message:
 ${chalk.grey('——————————————————')}
 ${commitMessage}
-${chalk.grey('——————————————————')}`
+${chalk.grey('——————————————————')}`,
     )
 
     const isCommitConfirmedByUser =
       skipCommitConfirmation ||
       (await confirm({
-        message: 'Confirm the commit message?'
+        message: 'Confirm the commit message?',
       }))
 
     if (isCancel(isCommitConfirmedByUser)) process.exit(1)
@@ -94,10 +94,10 @@ ${chalk.grey('——————————————————')}`
         'commit',
         '-m',
         commitMessage,
-        ...extraArgs
+        ...extraArgs,
       ])
       committingChangesSpinner.stop(
-        `${chalk.green('✔')} Successfully committed`
+        `${chalk.green('✔')} Successfully committed`,
       )
 
       outro(stdout)
@@ -115,7 +115,7 @@ ${chalk.grey('——————————————————')}`
 
       if (remotes.length === 1) {
         const isPushConfirmedByUser = await confirm({
-          message: 'Do you want to run `git push`?'
+          message: 'Do you want to run `git push`?',
         })
 
         if (isCancel(isPushConfirmedByUser)) process.exit(1)
@@ -128,13 +128,13 @@ ${chalk.grey('——————————————————')}`
           const { stdout } = await execa('git', [
             'push',
             '--verbose',
-            remotes[0]
+            remotes[0],
           ])
 
           pushSpinner.stop(
             `${chalk.green('✔')} Successfully pushed all commits to ${
               remotes[0]
-            }`
+            }`,
           )
 
           if (stdout) outro(stdout)
@@ -145,7 +145,7 @@ ${chalk.grey('——————————————————')}`
       } else {
         const selectedRemote = (await select({
           message: 'Choose a remote to push to',
-          options: remotes.map((remote) => ({ value: remote, label: remote }))
+          options: remotes.map((remote) => ({ value: remote, label: remote })),
         })) as string
 
         if (isCancel(selectedRemote)) process.exit(1)
@@ -160,13 +160,13 @@ ${chalk.grey('——————————————————')}`
 
         pushSpinner.stop(
           `${chalk.green(
-            '✔'
-          )} successfully pushed all commits to ${selectedRemote}`
+            '✔',
+          )} successfully pushed all commits to ${selectedRemote}`,
         )
       }
     } else {
       const regenerateMessage = await confirm({
-        message: 'Do you want to regenerate the message?'
+        message: 'Do you want to regenerate the message?',
       })
 
       if (isCancel(regenerateMessage)) process.exit(1)
@@ -175,13 +175,13 @@ ${chalk.grey('——————————————————')}`
         await generateCommitMessageFromGitDiff({
           diff,
           extraArgs,
-          fullGitMojiSpec
+          fullGitMojiSpec,
         })
       }
     }
   } catch (error) {
     commitGenerationSpinner.stop(
-      `${chalk.red('✖')} Failed to generate the commit message`
+      `${chalk.red('✖')} Failed to generate the commit message`,
     )
 
     console.log(error)
@@ -194,9 +194,9 @@ ${chalk.grey('——————————————————')}`
 
 export async function commit(
   extraArgs: string[] = [],
-  isStageAllFlag: boolean = false,
+  isStageAllFlag = false,
   fullGitMojiSpec = false,
-  skipCommitConfirmation = false
+  skipCommitConfirmation = false,
 ) {
   if (isStageAllFlag) {
     const changedFiles = await getChangedFiles()
@@ -229,7 +229,7 @@ export async function commit(
   if (!stagedFiles.length) {
     stagedFilesSpinner.stop('No files are staged')
     const isStageAllAndCommitConfirmedByUser = await confirm({
-      message: 'Do you want to stage all files and generate commit message?'
+      message: 'Do you want to stage all files and generate commit message?',
     })
 
     if (isCancel(isStageAllAndCommitConfirmedByUser)) process.exit(1)
@@ -244,8 +244,8 @@ export async function commit(
         message: chalk.cyan('Select the files you want to add to the commit:'),
         options: changedFiles.map((file) => ({
           value: file,
-          label: file
-        }))
+          label: file,
+        })),
       })) as string[]
 
       if (isCancel(files)) process.exit(1)
@@ -260,7 +260,7 @@ export async function commit(
   stagedFilesSpinner.stop(
     `${stagedFiles.length} staged files:\n${stagedFiles
       .map((file) => `  ${file}`)
-      .join('\n')}`
+      .join('\n')}`,
   )
 
   const [, generateCommitError] = await trytm(
@@ -268,8 +268,8 @@ export async function commit(
       diff: await getDiff({ files: stagedFiles }),
       extraArgs,
       fullGitMojiSpec,
-      skipCommitConfirmation
-    })
+      skipCommitConfirmation,
+    }),
   )
 
   if (generateCommitError) {

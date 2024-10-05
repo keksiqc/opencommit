@@ -1,10 +1,10 @@
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 
 const findModulePath = (moduleName: string) => {
   const searchPaths = [
     path.join('node_modules', moduleName),
-    path.join('node_modules', '.pnpm')
+    path.join('node_modules', '.pnpm'),
   ]
 
   for (const basePath of searchPaths) {
@@ -45,7 +45,10 @@ type QualifiedConfigOnAnyVersion = { [key: string]: unknown }
  */
 export const getCommitLintPWDConfig =
   async (): Promise<QualifiedConfigOnAnyVersion | null> => {
-    let load: Function, modulePath: string
+    // TODO: Replace any with a more specific type.
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    let load: any
+    let modulePath: string
     switch (await getCommitLintModuleType()) {
       case 'cjs':
         /**

@@ -2,7 +2,7 @@ import axios from 'axios'
 import { OpenAI } from 'openai'
 import { GenerateCommitMessageErrorEnum } from '../generateCommitMessageFromGitDiff'
 import { tokenCount } from '../utils/tokenCount'
-import { AiEngine, AiEngineConfig } from './Engine'
+import type { AiEngine, AiEngineConfig } from './Engine'
 
 export interface OpenAiConfig extends AiEngineConfig {}
 
@@ -18,20 +18,20 @@ export class OpenAiEngine implements AiEngine {
     } else {
       this.client = new OpenAI({
         apiKey: config.apiKey,
-        baseURL: config.baseURL
+        baseURL: config.baseURL,
       })
     }
   }
 
   public generateCommitMessage = async (
-    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
+    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
   ): Promise<string | null> => {
     const params = {
       model: this.config.model,
       messages,
       temperature: 0,
       top_p: 0.1,
-      max_tokens: this.config.maxTokensOutput
+      max_tokens: this.config.maxTokensOutput,
     }
 
     try {

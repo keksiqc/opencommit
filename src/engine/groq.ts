@@ -1,4 +1,4 @@
-import { OpenAiConfig, OpenAiEngine } from './openAi'
+import { type OpenAiConfig, OpenAiEngine } from './openAi'
 
 interface GroqConfig extends OpenAiConfig {}
 

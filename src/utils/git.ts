@@ -1,6 +1,6 @@
 import { execa } from 'execa'
 import { readFileSync } from 'fs'
-import ignore, { Ignore } from 'ignore'
+import ignore, { type Ignore } from 'ignore'
 
 import { outro, spinner } from '@clack/prompts'
 
@@ -35,7 +35,7 @@ export const getCoreHooksPath = async (): Promise<string> => {
 export const getStagedFiles = async (): Promise<string[]> => {
   const { stdout: gitDir } = await execa('git', [
     'rev-parse',
-    '--show-toplevel'
+    '--show-toplevel',
   ])
 
   const { stdout: files } = await execa('git', [
@@ -43,7 +43,7 @@ export const getStagedFiles = async (): Promise<string[]> => {
     '--name-only',
     '--cached',
     '--relative',
-    gitDir
+    gitDir,
   ])
 
   if (!files) return []
@@ -63,11 +63,11 @@ export const getChangedFiles = async (): Promise<string[]> => {
   const { stdout: others } = await execa('git', [
     'ls-files',
     '--others',
-    '--exclude-standard'
+    '--exclude-standard',
   ])
 
   const files = [...modified.split('\n'), ...others.split('\n')].filter(
-    (file) => !!file
+    (file) => !!file,
   )
 
   return files.sort()
@@ -93,26 +93,26 @@ export const getDiff = async ({ files }: { files: string[] }) => {
       file.includes('.jpg') ||
       file.includes('.jpeg') ||
       file.includes('.webp') ||
-      file.includes('.gif')
+      file.includes('.gif'),
   )
 
   if (lockFiles.length) {
     outro(
       `Some files are excluded by default from 'git diff'. No commit messages are generated for this files:\n${lockFiles.join(
-        '\n'
-      )}`
+        '\n',
+      )}`,
     )
   }
 
   const filesWithoutLocks = files.filter(
-    (file) => !file.includes('.lock') && !file.includes('-lock.')
+    (file) => !file.includes('.lock') && !file.includes('-lock.'),
   )
 
   const { stdout: diff } = await execa('git', [
     'diff',
     '--staged',
     '--',
-    ...filesWithoutLocks
+    ...filesWithoutLocks,
   ])
 
   return diff
