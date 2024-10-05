@@ -1,9 +1,9 @@
-import { intro, outro } from '@clack/prompts';
-import chalk from 'chalk';
-import { command } from 'cleye';
-import { configureCommitlintIntegration } from '../modules/commitlint/config';
-import { getCommitlintLLMConfig } from '../modules/commitlint/utils';
-import { COMMANDS } from './ENUMS';
+import { intro, outro } from '@clack/prompts'
+import chalk from 'chalk'
+import { command } from 'cleye'
+import { configureCommitlintIntegration } from '../modules/commitlint/config'
+import { getCommitlintLLMConfig } from '../modules/commitlint/utils'
+import { COMMANDS } from './ENUMS'
 
 export enum CONFIG_MODES {
   get = 'get',
@@ -16,29 +16,29 @@ export const commitlintConfigCommand = command(
     parameters: ['<mode>']
   },
   async (argv) => {
-    intro('opencommit — configure @commitlint');
+    intro('opencommit — configure @commitlint')
     try {
-      const { mode } = argv._;
+      const { mode } = argv._
 
       if (mode === CONFIG_MODES.get) {
-        const commitLintConfig = await getCommitlintLLMConfig();
+        const commitLintConfig = await getCommitlintLLMConfig()
 
-        outro(JSON.stringify(commitLintConfig, null, 2));
+        outro(JSON.stringify(commitLintConfig, null, 2))
 
-        return;
+        return
       }
 
       if (mode === CONFIG_MODES.force) {
-        await configureCommitlintIntegration(true);
-        return;
+        await configureCommitlintIntegration(true)
+        return
       }
 
       throw new Error(
         `Unsupported mode: ${mode}. Valid modes are: "force" and "get"`
-      );
+      )
     } catch (error) {
-      outro(`${chalk.red('✖')} ${error}`);
-      process.exit(1);
+      outro(`${chalk.red('✖')} ${error}`)
+      process.exit(1)
     }
   }
-);
+)

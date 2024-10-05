@@ -1,15 +1,15 @@
-import chalk from 'chalk';
+import chalk from 'chalk'
 
-import { outro } from '@clack/prompts';
+import { outro } from '@clack/prompts'
 
-import currentPackage from '../../package.json';
-import { getOpenCommitLatestVersion } from '../version';
+import currentPackage from '../../package.json'
+import { getOpenCommitLatestVersion } from '../version'
 
 export const checkIsLatestVersion = async () => {
-  const latestVersion = await getOpenCommitLatestVersion();
+  const latestVersion = await getOpenCommitLatestVersion()
 
   if (latestVersion) {
-    const currentVersion = currentPackage.version;
+    const currentVersion = currentPackage.version
 
     if (currentVersion !== latestVersion) {
       outro(
@@ -20,7 +20,7 @@ Current version: ${currentVersion}. Latest version: ${latestVersion}.
 🚀 To update run: npm i -g opencommit@latest.
         `
         )
-      );
+      )
     }
   }
-};
+}

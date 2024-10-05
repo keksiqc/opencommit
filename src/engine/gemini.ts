@@ -4,20 +4,20 @@ import {
   HarmBlockThreshold,
   HarmCategory,
   Part
-} from '@google/generative-ai';
-import axios from 'axios';
-import { OpenAI } from 'openai';
-import { AiEngine, AiEngineConfig } from './Engine';
+} from '@google/generative-ai'
+import axios from 'axios'
+import { OpenAI } from 'openai'
+import { AiEngine, AiEngineConfig } from './Engine'
 
 interface GeminiConfig extends AiEngineConfig {}
 
 export class GeminiEngine implements AiEngine {
-  config: GeminiConfig;
-  client: GoogleGenerativeAI;
+  config: GeminiConfig
+  client: GoogleGenerativeAI
 
   constructor(config) {
-    this.client = new GoogleGenerativeAI(config.apiKey);
-    this.config = config;
+    this.client = new GoogleGenerativeAI(config.apiKey)
+    this.config = config
   }
 
   async generateCommitMessage(
@@ -26,12 +26,12 @@ export class GeminiEngine implements AiEngine {
     const systemInstruction = messages
       .filter((m) => m.role === 'system')
       .map((m) => m.content)
-      .join('\n');
+      .join('\n')
 
     const gemini = this.client.getGenerativeModel({
       model: this.config.model,
       systemInstruction
-    });
+    })
 
     const contents = messages
       .filter((m) => m.role !== 'system')
@@ -40,8 +40,8 @@ export class GeminiEngine implements AiEngine {
           ({
             parts: [{ text: m.content } as Part],
             role: m.role === 'user' ? m.role : 'model'
-          } as Content)
-      );
+          }) as Content
+      )
 
     try {
       const result = await gemini.generateContent({
@@ -69,20 +69,20 @@ export class GeminiEngine implements AiEngine {
           temperature: 0,
           topP: 0.1
         }
-      });
+      })
 
-      return result.response.text();
+      return result.response.text()
     } catch (error) {
-      const err = error as Error;
+      const err = error as Error
       if (
         axios.isAxiosError<{ error?: { message: string } }>(error) &&
         error.response?.status === 401
       ) {
-        const geminiError = error.response.data.error;
-        if (geminiError) throw new Error(geminiError?.message);
+        const geminiError = error.response.data.error
+        if (geminiError) throw new Error(geminiError?.message)
       }
 
-      throw err;
+      throw err
     }
   }
 }

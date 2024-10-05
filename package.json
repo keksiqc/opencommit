@@ -26,14 +26,9 @@
   "type": "module",
   "author": "https://github.com/di-sukharev",
   "license": "MIT",
-  "files": [
-    "out/cli.cjs",
-    "out/tiktoken_bg.wasm"
-  ],
+  "files": ["out/cli.cjs", "out/tiktoken_bg.wasm"],
   "release": {
-    "branches": [
-      "master"
-    ]
+    "branches": ["master"]
   },
   "publishConfig": {
     "access": "public"

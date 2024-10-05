@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-import type { Config } from 'jest';
+import type { Config } from 'jest'
 
 const config: Config = {
   testTimeout: 100_000,
@@ -23,6 +23,6 @@ const config: Config = {
       }
     ]
   }
-};
+}
 
-export default config;
+export default config
