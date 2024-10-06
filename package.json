@@ -1,5 +1,5 @@
 {
-  "name": "@keksiqc/opencommit",
+  "name": "opencommit",
   "version": "3.2.2",
   "description": "Auto-generate impressive commits in 1 second. Killing lame commits with AI 🤯🔫",
   "keywords": [
@@ -26,9 +26,14 @@
   "type": "module",
   "author": "https://github.com/di-sukharev",
   "license": "MIT",
-  "files": ["out/cli.cjs", "out/tiktoken_bg.wasm"],
+  "files": [
+    "out/cli.cjs",
+    "out/tiktoken_bg.wasm"
+  ],
   "release": {
-    "branches": ["master"]
+    "branches": [
+      "master"
+    ]
   },
   "publishConfig": {
     "access": "public"
@@ -56,7 +61,6 @@
     "test:e2e:docker": "npm run test:docker-build && DOCKER_CONTENT_TRUST=0 docker run --rm oco-test npm run test:e2e"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.3",
     "@commitlint/types": "^17.4.4",
     "@types/ini": "^1.3.31",
     "@types/inquirer": "^9.0.3",
@@ -88,6 +92,7 @@
     "axios": "^1.3.4",
     "chalk": "^5.2.0",
     "cleye": "^1.3.2",
+    "crypto": "^1.0.1",
     "execa": "^7.0.0",
     "ignore": "^5.2.4",
     "ini": "^3.0.1",

@@ -1,36 +1,36 @@
-import type { OpenAI } from 'openai'
+import { OpenAI } from 'openai';
 
-import type { AiEngine } from './Engine'
+import { AiEngine } from './Engine';
 
 export const TEST_MOCK_TYPES = [
   'commit-message',
-  'prompt-module-commitlint-config',
-] as const
+  'prompt-module-commitlint-config'
+] as const;
 
-export type TestMockType = (typeof TEST_MOCK_TYPES)[number]
+export type TestMockType = (typeof TEST_MOCK_TYPES)[number];
 
 type TestAiEngine = Partial<AiEngine> & {
-  mockType: TestMockType
-}
+  mockType: TestMockType;
+};
 
 export class TestAi implements TestAiEngine {
-  mockType: TestMockType
+  mockType: TestMockType;
 
   // those are not used in the test engine
-  config: any
-  client: any
+  config: any;
+  client: any;
   // ---
 
   constructor(mockType: TestMockType) {
-    this.mockType = mockType
+    this.mockType = mockType;
   }
 
   async generateCommitMessage(
-    _messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
+    _messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
   ): Promise<string | undefined> {
     switch (this.mockType) {
       case 'commit-message':
-        return 'fix(testAi.ts): test commit message'
+        return 'fix(testAi.ts): test commit message';
       case 'prompt-module-commitlint-config':
         return (
           `{\n` +
@@ -39,9 +39,9 @@ export class TestAi implements TestAiEngine {
           `  "commitFeat": "feat(server): Allow server to listen on a port specified through environment variable",\n` +
           `  "commitDescription": "Change 'port' variable to uppercase 'PORT'. Allow server to listen on a port specified through environment variable."\n` +
           `}`
-        )
+        );
       default:
-        throw Error('unsupported test mock type')
+        throw Error('unsupported test mock type');
     }
   }
 }

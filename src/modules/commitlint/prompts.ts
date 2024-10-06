@@ -1,43 +1,39 @@
-import chalk from 'chalk'
-import type { OpenAI } from 'openai'
+import chalk from 'chalk';
+import { OpenAI } from 'openai';
 
-import { outro } from '@clack/prompts'
+import { outro } from '@clack/prompts';
 import {
-  type PromptConfig,
-  type QualifiedConfig,
+  PromptConfig,
+  QualifiedConfig,
   RuleConfigSeverity,
-  type RuleConfigTuple,
-} from '@commitlint/types'
+  RuleConfigTuple
+} from '@commitlint/types';
 
-import { getConfig } from '../../commands/config'
-import { type I18nLocals, i18n } from '../../i18n'
-import { IDENTITY, INIT_DIFF_PROMPT } from '../../prompts'
+import { getConfig } from '../../commands/config';
+import { i18n, I18nLocals } from '../../i18n';
+import { IDENTITY, INIT_DIFF_PROMPT } from '../../prompts';
 
-const config = getConfig()
-const translation = i18n[(config.OCO_LANGUAGE as I18nLocals) || 'en']
+const config = getConfig();
+const translation = i18n[(config.OCO_LANGUAGE as I18nLocals) || 'en'];
 
 type DeepPartial<T> = {
   [P in keyof T]?: {
-    [K in keyof T[P]]?: T[P][K]
-  }
-}
+    [K in keyof T[P]]?: T[P][K];
+  };
+};
 
 type PromptFunction = (
   applicable: string,
-  // TODO: Replace any with a more specific type.
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   value: any,
-  prompt: DeepPartial<PromptConfig>,
-) => string
+  prompt: DeepPartial<PromptConfig>
+) => string;
 
 type PromptResolverFunction = (
   key: string,
   applicable: string,
-  // TODO: Replace any with a more specific type.
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   value: any,
-  prompt?: DeepPartial<PromptConfig>,
-) => string
+  prompt?: DeepPartial<PromptConfig>
+) => string;
 
 /**
  * Extracts more contexte for each type-enum.
@@ -45,8 +41,8 @@ type PromptResolverFunction = (
  */
 const getTypeRuleExtraDescription = (
   type: string,
-  prompt?: DeepPartial<PromptConfig>,
-) => prompt?.questions?.type?.enum?.[type]?.description
+  prompt?: DeepPartial<PromptConfig>
+) => prompt?.questions?.type?.enum?.[type]?.description;
 
 /*
 IDEA: Compress llm readable prompt for each section of commit message: one line for header, one line for scope, etc.
@@ -55,7 +51,7 @@ IDEA: Compress llm readable prompt for each section of commit message: one line 
   - The subject should not be empty, should not end with a period, and should provide a concise description of the change. It should not be in sentence-case, start-case, pascal-case, or upper-case.
 */
 const llmReadableRules: {
-  [ruleName: string]: PromptResolverFunction
+  [ruleName: string]: PromptResolverFunction;
 } = {
   blankline: (key, applicable) =>
     `There should ${applicable} be a blank line at the beginning of the ${key}.`,
@@ -76,11 +72,10 @@ const llmReadableRules: {
     Array.isArray(value)
       ? value
           .map((v) => {
-            const description = getTypeRuleExtraDescription(v, prompt)
+            const description = getTypeRuleExtraDescription(v, prompt);
             if (description) {
-              return `${v} (${description})`
-            }
-            return v
+              return `${v} (${description})`;
+            } else return v;
           })
           .join('\n  - ')
       : value
@@ -90,15 +85,15 @@ const llmReadableRules: {
   maxLengthRule: (key, applicable, value: string) =>
     `The ${key} should ${applicable} have ${value} characters or less.`,
   minLengthRule: (key, applicable, value: string) =>
-    `The ${key} should ${applicable} have ${value} characters or more.`,
-}
+    `The ${key} should ${applicable} have ${value} characters or more.`
+};
 
 /**
  * TODO: Validate rules to every rule in the @commitlint configuration.
  * IDEA: Plugins can extend the list of rule. Provide user with a way to infer or extend when "No prompt handler for rule".
  */
 const rulesPrompts: {
-  [ruleName: string]: PromptFunction
+  [ruleName: string]: PromptFunction;
 } = {
   'body-case': (applicable: string, value: string | Array<string>) =>
     llmReadableRules.caseRule('body', applicable, value),
@@ -167,42 +162,42 @@ const rulesPrompts: {
   'type-max-length': (applicable: string, value: string) =>
     llmReadableRules.maxLengthRule('type', applicable, value),
   'type-min-length': (applicable: string, value: string) =>
-    llmReadableRules.minLengthRule('type', applicable, value),
-}
+    llmReadableRules.minLengthRule('type', applicable, value)
+};
 
 const getPrompt = (
   ruleName: string,
   ruleConfig: RuleConfigTuple<unknown>,
-  prompt: DeepPartial<PromptConfig>,
+  prompt: DeepPartial<PromptConfig>
 ) => {
-  const [severity, applicable, value] = ruleConfig
+  const [severity, applicable, value] = ruleConfig;
 
   // Should we exclude "Disabled" properties?
   // Is this used to disable a subjacent rule when extending presets?
-  if (severity === RuleConfigSeverity.Disabled) return null
+  if (severity === RuleConfigSeverity.Disabled) return null;
 
-  const promptFn = rulesPrompts[ruleName]
+  const promptFn = rulesPrompts[ruleName];
   if (promptFn) {
-    return promptFn(applicable, value, prompt)
+    return promptFn(applicable, value, prompt);
   }
 
   // Plugins may add their custom rules.
   // We might want to call OpenAI to build this rule's llm-readable prompt.
-  outro(`${chalk.red('✖')} No prompt handler for rule "${ruleName}".`)
-  return `Please manualy set the prompt for rule "${ruleName}".`
-}
+  outro(`${chalk.red('✖')} No prompt handler for rule "${ruleName}".`);
+  return `Please manualy set the prompt for rule "${ruleName}".`;
+};
 
 export const inferPromptsFromCommitlintConfig = (
-  config: QualifiedConfig,
+  config: QualifiedConfig
 ): string[] => {
-  const { rules, prompt } = config
-  if (!rules) return []
+  const { rules, prompt } = config;
+  if (!rules) return [];
   return Object.keys(rules)
     .map((ruleName) =>
-      getPrompt(ruleName, rules[ruleName] as RuleConfigTuple<unknown>, prompt),
+      getPrompt(ruleName, rules[ruleName] as RuleConfigTuple<unknown>, prompt)
     )
-    .filter((prompt) => prompt !== null) as string[]
-}
+    .filter((prompt) => prompt !== null) as string[];
+};
 
 /**
  * Breaking down commit message structure for conventional commit, and mapping bits with
@@ -211,11 +206,11 @@ export const inferPromptsFromCommitlintConfig = (
  */
 const STRUCTURE_OF_COMMIT = `
 - Header of commit is composed of type, scope, subject: <type-of-commit>(<scope-of-commit>): <subject-of-commit>
-- Description of commit is composed of body and footer (optional): <body-of-commit>\n<footer(s)-of-commit>`
+- Description of commit is composed of body and footer (optional): <body-of-commit>\n<footer(s)-of-commit>`;
 
 // Prompt to generate LLM-readable rules based on @commitlint rules.
 const GEN_COMMITLINT_CONSISTENCY_PROMPT = (
-  prompts: string[],
+  prompts: string[]
 ): OpenAI.Chat.Completions.ChatCompletionMessageParam[] => [
   {
     role: 'system',
@@ -246,10 +241,10 @@ Additional Details:
 - Changing the variable 'port' to uppercase 'PORT' is considered a bug fix. 
 - Allowing the server to listen on a port specified through the environment variable is considered a new feature. 
 
-Example Git Diff is to follow:`,
+Example Git Diff is to follow:`
   },
-  INIT_DIFF_PROMPT,
-]
+  INIT_DIFF_PROMPT
+];
 
 /**
  * Prompt to have LLM generate a message using @commitlint rules.
@@ -260,7 +255,7 @@ Example Git Diff is to follow:`,
  */
 const INIT_MAIN_PROMPT = (
   language: string,
-  prompts: string[],
+  prompts: string[]
 ): OpenAI.Chat.Completions.ChatCompletionMessageParam => ({
   role: 'system',
   content: `${IDENTITY} Your mission is to create clean and comprehensive commit messages in the given @commitlint convention and explain WHAT were the changes ${
@@ -287,10 +282,10 @@ You will strictly follow the following conventions to generate the content of th
 - ${prompts.join('\n- ')}
 
 The conventions refers to the following structure of commit message:
-${STRUCTURE_OF_COMMIT}`,
-})
+${STRUCTURE_OF_COMMIT}`
+});
 
 export const commitlintPrompts = {
   INIT_MAIN_PROMPT,
-  GEN_COMMITLINT_CONSISTENCY_PROMPT,
-}
+  GEN_COMMITLINT_CONSISTENCY_PROMPT
+};

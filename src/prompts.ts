@@ -1,18 +1,18 @@
-import { note } from '@clack/prompts'
-import type { OpenAI } from 'openai'
-import { getConfig } from './commands/config'
-import { type I18nLocals, i18n } from './i18n'
-import { configureCommitlintIntegration } from './modules/commitlint/config'
-import { commitlintPrompts } from './modules/commitlint/prompts'
-import type { ConsistencyPrompt } from './modules/commitlint/types'
-import * as utils from './modules/commitlint/utils'
-import { removeConventionalCommitWord } from './utils/removeConventionalCommitWord'
+import { note } from '@clack/prompts';
+import { OpenAI } from 'openai';
+import { getConfig } from './commands/config';
+import { i18n, I18nLocals } from './i18n';
+import { configureCommitlintIntegration } from './modules/commitlint/config';
+import { commitlintPrompts } from './modules/commitlint/prompts';
+import { ConsistencyPrompt } from './modules/commitlint/types';
+import * as utils from './modules/commitlint/utils';
+import { removeConventionalCommitWord } from './utils/removeConventionalCommitWord';
 
-const config = getConfig()
-const translation = i18n[(config.OCO_LANGUAGE as I18nLocals) || 'en']
+const config = getConfig();
+const translation = i18n[(config.OCO_LANGUAGE as I18nLocals) || 'en'];
 
 export const IDENTITY =
-  'You are to act as an author of a commit message in git.'
+  'You are to act as an author of a commit message in git.';
 
 const GITMOJI_HELP = `Use GitMoji convention to preface the commit. Here are some help to choose the right emoji (emoji, description): 
 🐛, Fix a bug; 
@@ -24,7 +24,7 @@ const GITMOJI_HELP = `Use GitMoji convention to preface the commit. Here are som
 ⬆️, Upgrade dependencies; 
 🔧, Add or update configuration files; 
 🌐, Internationalization and localization; 
-💡, Add or update comments in source code;`
+💡, Add or update comments in source code;`;
 
 const FULL_GITMOJI_SPEC = `${GITMOJI_HELP}
 🎨, Improve structure / format of the code; 
@@ -89,48 +89,48 @@ const FULL_GITMOJI_SPEC = `${GITMOJI_HELP}
 🧑‍💻, Improve developer experience; 
 💸, Add sponsorships or money related infrastructure; 
 🧵, Add or update code related to multithreading or concurrency; 
-🦺, Add or update code related to validation.`
+🦺, Add or update code related to validation.`;
 
 const CONVENTIONAL_COMMIT_KEYWORDS =
-  'Do not preface the commit with anything, except for the conventional commit keywords: fix, feat, build, chore, ci, docs, style, refactor, perf, test.'
+  'Do not preface the commit with anything, except for the conventional commit keywords: fix, feat, build, chore, ci, docs, style, refactor, perf, test.';
 
 const getCommitConvention = (fullGitMojiSpec: boolean) =>
   config.OCO_EMOJI
     ? fullGitMojiSpec
       ? FULL_GITMOJI_SPEC
       : GITMOJI_HELP
-    : CONVENTIONAL_COMMIT_KEYWORDS
+    : CONVENTIONAL_COMMIT_KEYWORDS;
 
 const getDescriptionInstruction = () =>
   config.OCO_DESCRIPTION
     ? 'Add a short description of WHY the changes are done after the commit message. Don\'t start it with "This commit", just describe the changes.'
-    : "Don't add any descriptions to the commit, only commit message."
+    : "Don't add any descriptions to the commit, only commit message.";
 
 const getOneLineCommitInstruction = () =>
   config.OCO_ONE_LINE_COMMIT
     ? 'Craft a concise commit message that encapsulates all changes made, with an emphasis on the primary updates. If the modifications share a common theme or scope, mention it succinctly; otherwise, leave the scope out to maintain focus. The goal is to provide a clear and unified overview of the changes in a one single message, without diverging into a list of commit per file change.'
-    : ''
+    : '';
 
 const INIT_MAIN_PROMPT = (
   language: string,
-  fullGitMojiSpec: boolean,
+  fullGitMojiSpec: boolean
 ): OpenAI.Chat.Completions.ChatCompletionMessageParam => ({
   role: 'system',
   content: (() => {
     const commitConvention = fullGitMojiSpec
       ? 'GitMoji specification'
-      : 'Conventional Commit Convention'
-    const missionStatement = `${IDENTITY} Your mission is to create clean and comprehensive commit messages as per the ${commitConvention} and explain WHAT were the changes and mainly WHY the changes were done.`
+      : 'Conventional Commit Convention';
+    const missionStatement = `${IDENTITY} Your mission is to create clean and comprehensive commit messages as per the ${commitConvention} and explain WHAT were the changes and mainly WHY the changes were done.`;
     const diffInstruction =
-      "I'll send you an output of 'git diff --staged' command, and you are to convert it into a commit message."
-    const conventionGuidelines = getCommitConvention(fullGitMojiSpec)
-    const descriptionGuideline = getDescriptionInstruction()
-    const oneLineCommitGuideline = getOneLineCommitInstruction()
-    const generalGuidelines = `Use the present tense. Lines must not be longer than 74 characters. Use ${language} for the commit message.`
+      "I'll send you an output of 'git diff --staged' command, and you are to convert it into a commit message.";
+    const conventionGuidelines = getCommitConvention(fullGitMojiSpec);
+    const descriptionGuideline = getDescriptionInstruction();
+    const oneLineCommitGuideline = getOneLineCommitInstruction();
+    const generalGuidelines = `Use the present tense. Lines must not be longer than 74 characters. Use ${language} for the commit message.`;
 
-    return `${missionStatement}\n${diffInstruction}\n${conventionGuidelines}\n${descriptionGuideline}\n${oneLineCommitGuideline}\n${generalGuidelines}`
-  })(),
-})
+    return `${missionStatement}\n${diffInstruction}\n${conventionGuidelines}\n${descriptionGuideline}\n${oneLineCommitGuideline}\n${generalGuidelines}`;
+  })()
+});
 
 export const INIT_DIFF_PROMPT: OpenAI.Chat.Completions.ChatCompletionMessageParam =
   {
@@ -158,66 +158,65 @@ export const INIT_DIFF_PROMPT: OpenAI.Chat.Completions.ChatCompletionMessagePara
                 -  console.log(\`Server listening on port \${port}\`);
                 +app.listen(process.env.PORT || PORT, () => {
                     +  console.log(\`Server listening on port \${PORT}\`);
-                });`,
-  }
+                });`
+  };
 
 const getContent = (translation: ConsistencyPrompt) => {
   const fix = config.OCO_EMOJI
     ? `🐛 ${removeConventionalCommitWord(translation.commitFix)}`
-    : translation.commitFix
+    : translation.commitFix;
 
   const feat = config.OCO_EMOJI
     ? `✨ ${removeConventionalCommitWord(translation.commitFeat)}`
-    : translation.commitFeat
+    : translation.commitFeat;
 
   const description = config.OCO_DESCRIPTION
     ? translation.commitDescription
-    : ''
+    : '';
 
-  return `${fix}\n${feat}\n${description}`
-}
+  return `${fix}\n${feat}\n${description}`;
+};
 
 const INIT_CONSISTENCY_PROMPT = (
-  translation: ConsistencyPrompt,
+  translation: ConsistencyPrompt
 ): OpenAI.Chat.Completions.ChatCompletionMessageParam => ({
   role: 'assistant',
-  content: getContent(translation),
-})
+  content: getContent(translation)
+});
 
 export const getMainCommitPrompt = async (
-  fullGitMojiSpec: boolean,
+  fullGitMojiSpec: boolean
 ): Promise<Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>> => {
   switch (config.OCO_PROMPT_MODULE) {
-    case '@commitlint': {
+    case '@commitlint':
       if (!(await utils.commitlintLLMConfigExists())) {
         note(
-          `OCO_PROMPT_MODULE is @commitlint but you haven't generated consistency for this project yet.`,
-        )
-        await configureCommitlintIntegration()
+          `OCO_PROMPT_MODULE is @commitlint but you haven't generated consistency for this project yet.`
+        );
+        await configureCommitlintIntegration();
       }
 
       // Replace example prompt with a prompt that's generated by OpenAI for the commitlint config.
-      const commitLintConfig = await utils.getCommitlintLLMConfig()
+      const commitLintConfig = await utils.getCommitlintLLMConfig();
 
       return [
         commitlintPrompts.INIT_MAIN_PROMPT(
           translation.localLanguage,
-          commitLintConfig.prompts,
+          commitLintConfig.prompts
         ),
         INIT_DIFF_PROMPT,
         INIT_CONSISTENCY_PROMPT(
           commitLintConfig.consistency[
             translation.localLanguage
-          ] as ConsistencyPrompt,
-        ),
-      ]
-    }
+          ] as ConsistencyPrompt
+        )
+      ];
 
     default:
       return [
         INIT_MAIN_PROMPT(translation.localLanguage, fullGitMojiSpec),
         INIT_DIFF_PROMPT,
-        INIT_CONSISTENCY_PROMPT(translation),
-      ]
+        INIT_CONSISTENCY_PROMPT(translation)
+      ];
   }
-}
+};

@@ -1,4 +1,4 @@
-import { getGlobalConfig, setGlobalConfig } from '../commands/config'
+import { getGlobalConfig, setGlobalConfig } from '../commands/config';
 
 export default function () {
   const obsoleteKeys = [
@@ -13,14 +13,14 @@ export default function () {
     'OCO_GEMINI_API_KEY',
     'OCO_GEMINI_BASE_PATH',
     'OCO_FLOWISE_API_KEY',
-    'OCO_FLOWISE_ENDPOINT',
-  ]
+    'OCO_FLOWISE_ENDPOINT'
+  ];
 
-  const globalConfig = getGlobalConfig()
+  const globalConfig = getGlobalConfig();
 
-  const configToOverride = { ...globalConfig }
+  const configToOverride = { ...globalConfig };
 
-  for (const key of obsoleteKeys) delete configToOverride[key]
+  for (const key of obsoleteKeys) delete configToOverride[key];
 
-  setGlobalConfig(configToOverride)
+  setGlobalConfig(configToOverride);
 }
