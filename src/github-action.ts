@@ -48,10 +48,10 @@ interface MsgAndSHA {
 
 // send only 3-4 size chunks of diffs in steps,
 // because openAI restricts "too many requests" at once with 429 error
-async function improveMessagesInChunks(diffsAndSHAs: DiffAndSHA[]) {
-  const chunkSize = diffsAndSHAs!.length % 2 === 0 ? 4 : 3
+async function improveMessagesInChunks(diffsAndSHAs: DiffAndSHA[]): Promise<MsgAndSHA[]> {
+  const chunkSize = diffsAndSHAs.length % 2 === 0 ? 4 : 3
   outro(`Improving commit messages in chunks of ${chunkSize}.`)
-  const improvePromises = diffsAndSHAs!.map((commit) =>
+  const improvePromises = diffsAndSHAs.map((commit) =>
     generateCommitMessageByDiff(commit.diff, false),
   )
 
@@ -65,7 +65,7 @@ async function improveMessagesInChunks(diffsAndSHAs: DiffAndSHA[]) {
       const chunkOfImprovedMessagesBySha = chunkOfImprovedMessages.map(
         (improvedMsg, i) => {
           const index = improvedMessagesAndSHAs.length
-          const sha = diffsAndSHAs![index + i].sha
+          const sha = diffsAndSHAs[index + i].sha
 
           return { sha, msg: improvedMsg }
         },
@@ -73,26 +73,21 @@ async function improveMessagesInChunks(diffsAndSHAs: DiffAndSHA[]) {
 
       improvedMessagesAndSHAs.push(...chunkOfImprovedMessagesBySha)
 
-      // sometimes openAI errors with 429 code (too many requests),
-      // so lets sleep a bit
       const sleepFor =
         1000 * randomIntFromInterval(1, 5) + 100 * randomIntFromInterval(1, 5)
 
       outro(
-        `Improved ${chunkOfPromises.length} messages. Sleeping for ${sleepFor}`,
+        `Improved ${chunkOfPromises.length} messages. Sleeping for ${sleepFor}ms`,
       )
 
       await sleep(sleepFor)
     } catch (error) {
       outro(error as string)
 
-      // if sleeping in try block still fails with 429,
-      // openAI wants at least 1 minute before next request
       const sleepFor = 60000 + 1000 * randomIntFromInterval(1, 5)
-      outro(`Retrying after sleeping for ${sleepFor}`)
+      outro(`Retrying after sleeping for ${sleepFor}ms`)
       await sleep(sleepFor)
 
-      // go to previous step
       step -= chunkSize
     }
   }
@@ -190,7 +185,7 @@ async function improveCommitMessages(
   outro('Done 🧙')
 }
 
-async function run() {
+async function run(): Promise<void> {
   intro('OpenCommit — improving lame commit messages')
 
   try {
@@ -201,9 +196,9 @@ async function run() {
 
       const commits = payload.commits
 
-      // Set local Git user identity for future git history manipulations
-      if (payload.pusher.email)
+      if (payload.pusher.email) {
         await exec.exec('git', ['config', 'user.email', payload.pusher.email])
+      }
 
       await exec.exec('git', ['config', 'user.name', payload.pusher.name])
 

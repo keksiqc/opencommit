@@ -490,44 +490,39 @@ export const getConfig = ({
 
   const config = mergeConfigs(envConfig, globalConfig)
 
-  const cleanConfig = cleanUndefinedValues(config)
+  return cleanUndefinedValues(config) as ConfigType
+}
 
-  return cleanConfig as ConfigType
+const parseConfigValue = (value: string | boolean | number | null) => {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value)
+    } catch (error) {
+      return value
+    }
+  }
+  return value
 }
 
 export const setConfig = (
   keyValues: [key: string, value: string | boolean | number | null][],
   globalConfigPath: string = defaultConfigPath,
-) => {
-  const config = getConfig({
-    globalPath: globalConfigPath,
-  })
-
-  const configToSet = {}
+): void => {
+  const config = getConfig({ globalPath: globalConfigPath })
+  const configToSet: Partial<ConfigType> = {}
 
   for (const [key, value] of keyValues) {
-    if (!configValidators.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(configValidators, key)) {
       const supportedKeys = Object.keys(configValidators).join('\n')
       throw new Error(
         `Unsupported config key: ${key}. Expected keys are:\n\n${supportedKeys}.\n\nFor more help refer to our docs: https://github.com/di-sukharev/opencommit`,
       )
     }
 
-    let parsedConfigValue
+    const parsedConfigValue = parseConfigValue(value)
+    const validValue = configValidators[key as CONFIG_KEYS](parsedConfigValue, config)
 
-    try {
-      if (typeof value === 'string') parsedConfigValue = JSON.parse(value)
-      else parsedConfigValue = value
-    } catch (error) {
-      parsedConfigValue = value
-    }
-
-    const validValue = configValidators[key as CONFIG_KEYS](
-      parsedConfigValue,
-      config,
-    )
-
-    configToSet[key] = validValue
+    configToSet[key as CONFIG_KEYS] = validValue
   }
 
   setGlobalConfig(mergeConfigs(configToSet, config), globalConfigPath)

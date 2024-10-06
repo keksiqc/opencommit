@@ -1,4 +1,4 @@
-import axios from 'axios'
+import { AxiosError } from 'axios'
 import { OpenAI } from 'openai'
 import { GenerateCommitMessageErrorEnum } from '../generateCommitMessageFromGitDiff'
 import { tokenCount } from '../utils/tokenCount'
@@ -7,26 +7,21 @@ import type { AiEngine, AiEngineConfig } from './Engine'
 export interface OpenAiConfig extends AiEngineConfig {}
 
 export class OpenAiEngine implements AiEngine {
-  config: OpenAiConfig
-  client: OpenAI
+  private readonly config: OpenAiConfig
+  private readonly client: OpenAI
 
   constructor(config: OpenAiConfig) {
     this.config = config
-
-    if (!config.baseURL) {
-      this.client = new OpenAI({ apiKey: config.apiKey })
-    } else {
-      this.client = new OpenAI({
-        apiKey: config.apiKey,
-        baseURL: config.baseURL,
-      })
-    }
+    this.client = new OpenAI({
+      apiKey: config.apiKey,
+      baseURL: config.baseURL || undefined,
+    })
   }
 
-  public generateCommitMessage = async (
-    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>,
-  ): Promise<string | null> => {
-    const params = {
+  public async generateCommitMessage(
+    messages: Array<OpenAI.Chat.Completions.ChatCompletionMessageParam>
+  ): Promise<string> {
+    const params: OpenAI.Chat.Completions.ChatCompletionCreateParams = {
       model: this.config.model,
       messages,
       temperature: 0,
@@ -35,33 +30,31 @@ export class OpenAiEngine implements AiEngine {
     }
 
     try {
-      const REQUEST_TOKENS = messages
-        .map((msg) => tokenCount(msg.content as string) + 4)
-        .reduce((a, b) => a + b, 0)
-
-      if (
-        REQUEST_TOKENS >
-        this.config.maxTokensInput - this.config.maxTokensOutput
+      const REQUEST_TOKENS = messages.reduce(
+        (total, msg) => total + tokenCount(msg.content as string) + 4,
+        0
       )
+
+      if (REQUEST_TOKENS > this.config.maxTokensInput - this.config.maxTokensOutput) {
         throw new Error(GenerateCommitMessageErrorEnum.tooMuchTokens)
-
-      const completion = await this.client.chat.completions.create(params)
-
-      const message = completion.choices[0].message
-
-      return message?.content
-    } catch (error) {
-      const err = error as Error
-      if (
-        axios.isAxiosError<{ error?: { message: string } }>(error) &&
-        error.response?.status === 401
-      ) {
-        const openAiError = error.response.data.error
-
-        if (openAiError) throw new Error(openAiError.message)
       }
 
-      throw err
+      const completion = await this.client.chat.completions.create(params)
+      const message = completion.choices[0].message
+
+      if (!message?.content) {
+        throw new Error('No content generated')
+      }
+
+      return message.content
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        const openAiError = error.response.data.error
+        if (openAiError?.message) {
+          throw new Error(openAiError.message)
+        }
+      }
+      throw error
     }
   }
 }
