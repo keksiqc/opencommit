@@ -17,7 +17,6 @@
       }
     }
   },
-  "packageManager": "npm",
   "rules": {
     "prettier/prettier": "error",
     "no-console": "error",
@@ -31,3 +30,4 @@
     "@typescript-eslint/no-non-null-assertion": "off"
   }
 }
+
